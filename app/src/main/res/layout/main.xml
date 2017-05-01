@@ -12,10 +12,24 @@
 		android:layout_weight="1.0"
 		android:id="@+id/danmaku"/>
 
-	<Button
+	<LinearLayout
 		android:layout_height="wrap_content"
-		android:layout_width="wrap_content"
-		android:text="Button"/>
+		android:layout_width="match_parent"
+		android:orientation="horizontal">
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="Button"
+			android:onClick="start"/>
+
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="Button"
+			android:onClick="pause"/>
+
+	</LinearLayout>
 
 </LinearLayout>
 
