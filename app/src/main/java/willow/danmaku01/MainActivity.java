@@ -45,4 +45,6 @@ public class MainActivity extends Activity
 	public void pause(View v){
 		danmaku.GAME_SITU=danmaku.isPAUSE;
 	}
+	
+	
 }
