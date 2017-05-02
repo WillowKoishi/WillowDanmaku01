@@ -8,8 +8,8 @@ android {
         applicationId "willow.danmaku01"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 1
-        versionName "wd01"
+        versionCode 4
+        versionName "wd01 0.0.3"
     }
     buildTypes {
         release {
@@ -20,5 +20,6 @@ android {
 }
 
 dependencies {
+	compile 'com.android.support:appcompat-v7:+'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
