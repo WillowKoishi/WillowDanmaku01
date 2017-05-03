@@ -80,4 +80,13 @@ float p,s;
 		}
 		
 	};
+
+	@Override
+	protected void onDestroy()
+	{danmaku.onDea();
+	//System.exit(0);
+		// TODO: Implement this method
+		super.onDestroy();
+	}
+	
 }
