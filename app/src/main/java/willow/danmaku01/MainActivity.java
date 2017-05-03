@@ -63,6 +63,7 @@ float p,s;
 		{//if(danmaku.game_life<=0){
 			//danmaku.GAME_SITU=danmaku.isDEAD;
 		//}
+		danmaku.secs=danmaku.frame2-p;
 			p=danmaku.frame2;
 			h.postDelayed(r,1000);
 			danmaku.addEnemy();

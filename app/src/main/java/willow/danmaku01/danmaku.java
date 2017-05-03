@@ -9,9 +9,10 @@ import java.util.*;
 import android.media.*;
 import android.text.method.*;
 import java.io.*;
+import android.os.*;
 
 public class danmaku extends View
-{private Paint paint,pauseText;
+{private Paint paint,pauseText,pauseText2;
 	public float selfX,selfY;
 	public long game=0,frame2,no_enemy_time,frame3;
 	public int game_life=3;
@@ -25,7 +26,10 @@ public class danmaku extends View
 	public int GAME_SITU;
 	public boolean liftoff=false,no_enemy=false;
 	private Bitmap jmp;
-	private MediaPlayer sound_explo=new MediaPlayer();
+	public Context mContext;
+
+	//private MediaPlayer sound_explo;
+	private SoundPool soundPool;
 	public void init(Context context)
 	{
 		Bitmap nmp=((BitmapDrawable)getResources().getDrawable(R.drawable.loser)).getBitmap();
@@ -36,19 +40,23 @@ public class danmaku extends View
 		jmp = ((BitmapDrawable)getResources().getDrawable(R.drawable.earth_sky_background)).getBitmap();
 		Bitmap imp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy1)).getBitmap();
 		enemy1 = Bitmap.createScaledBitmap(imp, imp.getWidth() / 5, imp.getHeight() / 5, true);
-		sound_explo.create(context,R.raw.explo);
-		try
-		{
-			sound_explo.prepare();
-		}
-		catch (IOException e)
-		{}
-		catch (IllegalStateException e)
-		{}
+		//sound_explo=new MediaPlayer().create(context,R.raw.explo);
+		soundPool= new SoundPool(50,AudioManager.STREAM_MUSIC,4);
+		soundPool.load(context,R.raw.explo,1);
+		soundPool.load(context,R.raw.pdel,2);
+		soundPool.load(context,R.raw.pshot,3);
+		soundPool.load(context,R.raw.item,4);
 		pauseText = new Paint();
 		pauseText.setAntiAlias(true);
 		pauseText.setColor(Color.argb(200, 255, 255, 255));
-		pauseText.setTextSize(40);
+		pauseText.setTextSize(60);
+		pauseText.setTextAlign(Paint.Align.CENTER);
+		pauseText.setTypeface(Typeface.createFromAsset(context.getAssets(),"font/ttc.ttc"));
+		pauseText2=new Paint();
+		pauseText2.setAntiAlias(true);
+		pauseText2.setColor(Color.WHITE);
+		pauseText2.setTextSize(20);
+		pauseText2.setTypeface(Typeface.createFromAsset(context.getAssets(),"font/exoi.ttf"));
 		GAME_SITU = isSTART;
 		paint = new Paint();
 		paint.setAntiAlias(true);
@@ -61,29 +69,33 @@ public class danmaku extends View
 		if (GAME_SITU == isSTART)
 		{
 			startGame(canvas);}
-		if (GAME_SITU == isPAUSE)
+		if (GAME_SITU == isPAUSE||GAME_SITU==isDEAD)
 		{
 			pauseGame(canvas);}
-		canvas.drawText("FPS:" + secs, 0, getHeight() - 20f, pauseText);
-		canvas.drawText("Life:"+game_life,0,getHeight()-55f,pauseText);
+		canvas.drawText("FPS:" +secs, 0, getHeight() - 20f, pauseText2);
+		canvas.drawText("Life:"+game_life,0,getHeight()-55f,pauseText2);
 	invalidate();
 		super.onDraw(canvas);
 	}
 	/*----------------------------------------*/
 	public danmaku(Context context)
 	{
+		
 		super(context);
 		init(context);
+		mContext=context;
 	}
 	public danmaku(Context context, AttributeSet attributeSet)
 	{
 		super(context, attributeSet);
 		init(context);
+		mContext=context;
 	}
 	public danmaku(Context context, AttributeSet attributeSet, int defStyle)
 	{
 		super(context, attributeSet, defStyle);
 		init(context);
+		mContext=context;
 	}
 	/*----------------------------------------*/
 	public void startGame(Canvas canvas)
@@ -113,7 +125,7 @@ public class danmaku extends View
 		if (!liftoff)
 		{
 			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
-			move = move + 0.02f * frame2;
+			move = move + 0.02f * frame3;
 			if (move >= bg_grass.getHeight())
 			{
 				liftoff = true;
@@ -130,27 +142,27 @@ public class danmaku extends View
 			shotDanmaku sd=shotDAnmaku.get(i);
 			canvas.drawBitmap(sd.tietu, sd.x - shot.getWidth() / 2f, sd.getY() - shot.getHeight() / 3, paint);
 			sd.y = sd.y + getHeight() / 100f * sd.ay;
-			if (sd.getY() < 0 - shot.getHeight() - getHeight() * 2)
+			if (sd.getY() < 0 - shot.getHeight() )//- getHeight() * 2)
 			{
 				shotDAnmaku.remove(i);
 			}
-			if (sd.getY() + sd.tietu.getHeight() / 2f < 0)
-			{
-				sd.haveShot = true;
-			}
-			drawEnemy(canvas); 
+			//if (sd.getY() + sd.tietu.getHeight() / 2f < 0)
+			//{
+				//sd.haveShot = true;
+			//}
 		}
-		if (frame == 15)
+		if (frame == 10)
 		{
 			frame = 1;
 		}
-		if (frame == 1)
+		if (frame == 1&&!no_enemy)
 		{
 			shotDanmaku st=new shotDanmaku();
 			st.x = selfX;
 			st.y = selfY - mmp.getHeight();
 			shot = Bitmap.createScaledBitmap(lmp, lmp.getWidth() / 15, lmp.getHeight() / 15, true);
 			st.tietu = shot;
+			soundPool.play(3,1, 1, 0, 0, 1);
 			shotDAnmaku.add(st);
 		}
 		if (selfX < 0)
@@ -171,6 +183,9 @@ public class danmaku extends View
 		}
 		part1();
 		drawSelf(canvas);
+		for(int l=0;l<2;l++){
+		drawEnemy(canvas); 
+		}
 		// pectime=fps/100000000000000f;
 	}
 	/*----------------------------------------*/
@@ -193,9 +208,9 @@ public class danmaku extends View
 		}
 		drawSelf(canvas);
 		if(GAME_SITU==isPAUSE){
-			canvas.drawText("游戏暂停", getWidth() / 5f, getHeight() / 2f, pauseText);
+			canvas.drawText("遊戲暫停", getWidth() / 2f,getHeight() / 3f, pauseText);
 		}else if(GAME_SITU==isDEAD){
-			canvas.drawText("满目疮痍", getWidth() / 5f, getHeight() / 2f, pauseText);
+			canvas.drawText("滿目瘡痍", getWidth() / 2f, getHeight() / 3f, pauseText);
 		}
 
 	} 
@@ -309,15 +324,20 @@ public class danmaku extends View
 					{
 						me.isDEAD = true;
 						soundExplo();}
-					sd.haveShot = true;
-					sd.tietu.setWidth(1);
-					sd.tietu.setHeight(1);
+						else{
+							soundPool.play(4,1,1,0,0,1);
+						}
+					//sd.haveShot = true;
+					//sd.tietu.setWidth(1);
+					//sd.tietu.setHeight(1);
+					shotDAnmaku.remove(j);
 				}
 				if(selfX> me.postX - me.tietu.getWidth() / 2f
 					&&selfX  < me.postX + me.tietu.getWidth() / 2f
 					&&selfY < me.postY + me.tietu.getHeight() / 2f
 					&&selfY  > me.postY - me.tietu.getHeight() / 2f
-					&&!no_enemy){
+					&&!no_enemy
+					&&game_life>0){
 					isShotByEnemy();
 					enemy.remove(i);
 					}
@@ -330,14 +350,15 @@ public class danmaku extends View
 		mEnemy.postX = getWidth() * (float)(Math.random());
 		mEnemy.isDEAD = false;
 		mEnemy.postY = -enemy1.getHeight();
-		mEnemy.vy = 1;
-		mEnemy.life = 1;
+		mEnemy.vy = 2;
+		mEnemy.life = 4;
 		mEnemy.tietu = enemy1;
 		enemy.add(mEnemy);
 	}
 	public void reSet(){
 		game=0;
 		frame2=0;
+		frame3=0;
 		move=0;
 		liftoff=false;
 		enemy.clear();
@@ -349,9 +370,10 @@ public class danmaku extends View
 		paint.setColor(Color.argb(255, 255, 88, 88));
 	}
 	public void isShotByEnemy(){
+		soundPool.play(2,1, 1, 0, 0, 1);
 		game_life=game_life-1;
 		if(game_life<=0){
-			//GAME_SITU=isDEAD;
+			GAME_SITU=isDEAD;
 		}
 		else{
 			no_enemy=true;
@@ -359,9 +381,11 @@ public class danmaku extends View
 			selfX = getWidth() / 2f;
 			selfY = getHeight() / 3f * 2f;
 		}
-		soundExplo();
 	}
 	public void soundExplo(){
-		sound_explo.start();
+		
+		//sound_explo.setDataSource(File);
+	
+		soundPool.play(1,1, 1, 0, 0, 1);
 	}
 }
