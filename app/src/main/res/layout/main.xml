@@ -38,6 +38,13 @@
 			android:onClick="addenemy"
 			style="@style/AppTheme"/>
 
+		<Button
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:text="Bomb"
+			android:id="@+id/mainButton1"
+			android:onClick="bomb"/>
+
 	</LinearLayout>
 
 </LinearLayout>

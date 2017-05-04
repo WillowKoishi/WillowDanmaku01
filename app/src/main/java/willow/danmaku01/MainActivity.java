@@ -56,6 +56,9 @@ float p,s;
 		danmaku.reSet();
 		p=0;
 	}
+	public void bomb(View v){
+		
+	}
 	Runnable r=new Runnable(){
 
 		@Override
