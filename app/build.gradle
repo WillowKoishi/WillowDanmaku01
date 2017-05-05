@@ -8,8 +8,8 @@ android {
         applicationId "willow.danmaku01"
         minSdkVersion 14
         targetSdkVersion 21
-        versionCode 4
-        versionName "wd01 0.0.3"
+        versionCode 9
+        versionName "wd01 0.0.9"
     }
     buildTypes {
         release {

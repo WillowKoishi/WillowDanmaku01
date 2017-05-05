@@ -8,7 +8,7 @@ import android.support.v7.app.*;
 
 public class MainActivity extends AppCompatActivity
 {danmaku danmaku;
-float p,s;
+float p,s,e;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {setTheme(R.style.AppTheme);
@@ -57,7 +57,8 @@ float p,s;
 		p=0;
 	}
 	public void bomb(View v){
-		
+		if(danmaku.unBombTime){
+		danmaku.bombTime=true;}
 	}
 	Runnable r=new Runnable(){
 
