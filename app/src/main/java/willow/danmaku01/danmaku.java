@@ -11,28 +11,32 @@ import android.text.method.*;
 import java.io.*;
 import android.os.*;
 import willow.danmaku01.danmaku.*;
+import android.graphics.drawable.shapes.*;
 
 public class danmaku extends View
-{private Paint paint,pauseText,pauseText2,textPaint;
+{private Paint paint,pauseText,pauseText2,textPaint,sOBPaint;
 	public float selfX,selfY,unit,power=0;
 	public long game=0,frame2,no_enemy_time,frame3,score,bombTimeFrame;
-	public int game_life=3,sound,point,allPoint;
+	public int game_life=3,sound,point,allPoint,stage=1;
 	public Path earth_sky;
 	boolean b1=true,b2=true,b3=true,b4=true;
+	String[] stageName={"","簡星表面","卡門線邊縁","",""};
+	public int DANMAKU_TYPE_CIRCLE=0,DANMAKU_TYPE_BITMAP=1,DANMAKU_TYPE_RAY=2;
 	public List<shotDanmaku> shotDAnmaku=new ArrayList<shotDanmaku>();
 	public List<Enemy> enemy=new ArrayList<Enemy>();
 	public List<Bonus> bonus_list=new ArrayList<Bonus>();
 	public List<Text> text_list=new ArrayList<Text>();
 	public List<BombDanmaku> bomb_list=new ArrayList<BombDanmaku>();
+	public List<ShotOrBoom> sOB=new ArrayList<ShotOrBoom>();
 	public float touchX,touchY,move,pectime,secs,fps;
 	public Bitmap mmp,shot,bg_grass,sky,enemy1,lmp,jmp,dian,pOwer,bomb,shot1,emp,finalB,bombshot,fire;
 	public float frame=1,bg_garss_m;
 	public static final int isSTART=0,isPAUSE=1,isDEAD=2,isTALK=3,DRAWABLE_CANVAS=0,DRAWABLE_BITMAP=1;
 	public int GAME_SITU;
-	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true;
+	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true,useAntiAlias=true;
 	public Context mContext;
 	public Matrix m;
-
+	public Bitmap[] exploPng;
 	//private MediaPlayer sound_explo;
 	private SoundPool soundPool;
 	public void init(Context context)//初始化游戏资源
@@ -55,10 +59,21 @@ public class danmaku extends View
 		Bitmap dmp=((BitmapDrawable)getResources().getDrawable(R.drawable.f)).getBitmap();
 		finalB = Bitmap.createScaledBitmap(dmp, dmp.getWidth() / 2, dmp.getHeight() / 2, true);
 		Bitmap cmp=((BitmapDrawable)getResources().getDrawable(R.drawable.bomb)).getBitmap();
-		bombshot = Bitmap.createScaledBitmap(cmp, cmp.getWidth() / 6, cmp.getHeight() / 6, true);
+		bombshot = Bitmap.createScaledBitmap(cmp, cmp.getWidth() / 4, cmp.getHeight() / 4, true);
 		Bitmap bmp=((BitmapDrawable)getResources().getDrawable(R.drawable.fire)).getBitmap();
 		fire=Bitmap.createScaledBitmap(bmp, bmp.getWidth() / 5, bmp.getHeight() / 5, true);
 		//加载游戏音效
+		exploPng=new Bitmap[10];
+		exploPng[0]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo0)).getBitmap();
+		exploPng[1]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo1)).getBitmap();
+		exploPng[2]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo2)).getBitmap();
+		exploPng[3]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo3)).getBitmap();
+		exploPng[4]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo4)).getBitmap();
+		exploPng[5]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo5)).getBitmap();
+		exploPng[6]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo6)).getBitmap();
+		exploPng[7]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo7)).getBitmap();
+		exploPng[8]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo8)).getBitmap();
+		exploPng[9]=((BitmapDrawable)getResources().getDrawable(R.drawable.explo9)).getBitmap();
 		soundPool = new SoundPool(200, AudioManager.STREAM_MUSIC, 5);
 		soundPool.load(context, R.raw.explo, 3);
 		soundPool.load(context, R.raw.pdel, 2);
@@ -68,25 +83,28 @@ public class danmaku extends View
 		soundPool.load(context, R.raw.bom, 6);
 		soundPool.load(context,R.raw.change,2);
 		pauseText = new Paint();
-		pauseText.setAntiAlias(true);
+		pauseText.setAntiAlias(useAntiAlias);
 		pauseText.setColor(Color.argb(200, 255, 255, 255));
 		pauseText.setTextSize(60);
 		pauseText.setTextAlign(Paint.Align.CENTER);
 		pauseText.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"));
 		pauseText2 = new Paint();
-		pauseText2.setAntiAlias(true);
+		pauseText2.setAntiAlias(useAntiAlias);
 		pauseText2.setColor(Color.WHITE);
 		pauseText2.setTextSize(25);
 		pauseText2.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/exoi.ttf"));
 		textPaint = new Paint();
-		textPaint.setAntiAlias(true);
+		textPaint.setAntiAlias(useAntiAlias);
 		textPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"));
 		textPaint.setTextSize(60);
 		textPaint.setTextAlign(Paint.Align.CENTER);
 		GAME_SITU = isSTART;
 		paint = new Paint();
-		paint.setAntiAlias(true);
+		paint.setAntiAlias(useAntiAlias);
 		paint.setColor(Color.argb(255, 255, 88, 88));
+		sOBPaint=new Paint();
+		sOBPaint.setAntiAlias(useAntiAlias);
+		sOBPaint.setColor(0xffffaa33);
 	}
 	@Override
 	protected void onDraw(Canvas canvas)
@@ -110,6 +128,7 @@ public class danmaku extends View
 		canvas.drawText("Point:" + allPoint + "/100", 0, getHeight() - 50f, pauseText2);
 		invalidate();
 		super.onDraw(canvas);
+		
 	}
 	/*----------------------------------------*/
 	public danmaku(Context context)
@@ -137,7 +156,7 @@ public class danmaku extends View
 		{unit = getHeight() / 100f;
 			selfX = getWidth() / 2f;
 			selfY = getHeight() / 3f * 2f;
-			showText("〜Stage 1〜", 1);
+			showText("〜Stage "+stage+"〜", 1);
 			game = +1;
 			sky = Bitmap.createScaledBitmap(jmp, getWidth(), getHeight(), true);
 			bg_garss_m = selfY + mmp.getHeight() / 2f;
@@ -149,7 +168,7 @@ public class danmaku extends View
 		}
 		if (frame3 == 120)
 		{
-			showText("簡星表面", 2);
+			showText(stageName[stage], 2);
 			canShot = true;
 		}
 		if (no_enemy == true)
@@ -187,7 +206,7 @@ public class danmaku extends View
 			sd.thereTime++;
 			sd.y = sd.y + sd.vy + sd.thereTime * sd.ay * unit;
 			sd.x = sd.x + sd.vx * unit + sd.thereTime * sd.ax * unit;
-			canvas.drawBitmap(sd.tietu, sd.x - sd.tietu.getWidth() / 2f+3, sd.y - sd.tietu.getHeight() / 2, paint);
+			canvas.drawBitmap(sd.tietu, sd.x - sd.tietu.getWidth() / 2f, sd.y - sd.tietu.getHeight() / 2, paint);
 			if (sd.y < 0 - shot.getHeight())//- getHeight() * 2)
 			{
 				shotDAnmaku.remove(i);
@@ -208,12 +227,16 @@ public class danmaku extends View
 				unBombTime=false;
 			}
 			bombTimeFrame++;
-			if(bombTimeFrame%20==0){
+			if(bombTimeFrame%30==0){
 				addBomb();
 			}
-			if(bombTimeFrame>180){
+			setTop((int)(20*Math.random())-10);
+			setLeft((int)(20*Math.random())-10);
+			if(bombTimeFrame>150){
 				bombTime=false;
 				unBombTime=!bombTime;
+				setTop(0);
+				setLeft(0);
 			}
 		}
 		if (frame == 10)
@@ -307,28 +330,22 @@ public class danmaku extends View
 		else if (selfY > getHeight())
 		{
 			selfY = getHeight() - 1;
-		}
-		part1();
-
-
-		for (int l=0;l < 2;l++)
-		{
-			drawBonus(canvas);}
-		
+		}	
 		drawBomb(canvas);
 		drawSelf(canvas);
 		for (int l=0;l < 2;l++)
 		{
+			drawBonus(canvas);}
+		for (int l=0;l < 2;l++)
+		{
 			drawEnemy(canvas); 
 		}
-
+drawShotOrBoom(canvas);
 	}
 	/*------------------游戏暂停或死亡----------------------*/
 	private void pauseGame(Canvas canvas)
 	{ drawSky(canvas);
-		drawBonus(canvas);
 		canvas.drawBitmap(fire,selfX-mmp.getWidth()/2f+2,selfY+mmp.getHeight()/2f,paint);
-		drawEnemy(canvas);
 		if (!liftoff)
 		{
 			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
@@ -340,7 +357,9 @@ public class danmaku extends View
 		}
 		drawBomb(canvas);
 		drawSelf(canvas);
-
+		drawBonus(canvas);
+		drawEnemy(canvas);
+		drawShotOrBoom(canvas);
 		if (GAME_SITU == isPAUSE)
 		{
 			canvas.drawText("遊戲暫停", getWidth() / 2f, getHeight() / 3f, pauseText);
@@ -394,6 +413,14 @@ public class danmaku extends View
 	{
 		float rotat=0;
 	}
+	public class EnemyDanmaku extends Sprite{
+		int Shape=DANMAKU_TYPE_CIRCLE;	
+	}
+	public class ShotOrBoom extends Sprite{
+		int Shape=DANMAKU_TYPE_CIRCLE;
+		boolean isForSelf=false;
+		float scale=2;
+	}
 	/*-------------------对象绘制方法---------------------*/
 	private void drawSelf(Canvas canvas)
 	{
@@ -420,24 +447,27 @@ public class danmaku extends View
 			Enemy me=enemy.get(i);
 			if (GAME_SITU == isSTART)
 			{
-				me.postY = me.postY + me.vy;
-				
+				me.postY = me.postY + me.vy+me.ay*me.thereTime;	
+				me.postX=me.postX+me.ax*me.thereTime;
 			}
 			canvas.drawBitmap(me.tietu, me.postX - me.tietu.getWidth() / 2f, me.postY - me.tietu.getHeight() / 2f, paint);
 
-			if (me.isDEAD || me.postY > getHeight() + me.tietu.getHeight() / 2f
-				|| me.postX < -me.tietu.getWidth()
-				|| me.postX > getWidth() + me.tietu.getWidth() || me.isDEAD)
+			if (me.isDEAD)
 			{
-				enemy.remove(i);
+				enemy.remove(i);			
+			}
+			if(me.life<=0){
 				addBonus(0, me.bonus, me.postX, me.postY);
 				score = score + 100;
 				soundExplo();
-			}
-			if(me.life<=0){
-				
 				me.isDEAD=true;
+				addSOB(me.postX,me.postY,me.tietu.getWidth()/64f,DANMAKU_TYPE_BITMAP,false);
 			}
+			if( me.postY > getHeight() + me.tietu.getHeight() / 2f
+			   || me.postX < -me.tietu.getWidth()
+			   || me.postX > getWidth() + me.tietu.getWidth()){
+				   me.isDEAD=true;
+			   }
 			for (int j=0;j < shotDAnmaku.size();j = j + 1)
 			{
 				shotDanmaku sd=shotDAnmaku.get(j);
@@ -455,12 +485,13 @@ public class danmaku extends View
 					if (me.life <= 0)
 					{
 						me.isDEAD = true;
+						
 						}
 					else
 					{
 						score = score + 10;
-						soundPool.play(5, 1, 1, 0, 0, 1);
-
+						soundPool.play(5, 0.8f, 0.8f, 0, 0, 1);
+						addSOB(sd.x,sd.y,1,DANMAKU_TYPE_CIRCLE,false);
 					}
 					//sd.haveShot = true;
 					//sd.tietu.setWidth(1);
@@ -573,6 +604,7 @@ public class danmaku extends View
 			canvas.drawBitmap(bd.tietu,m,paint);	
 			if(bd.isDEAD||bd.thereTime>=300){
 				bomb_list.remove(i);
+				addSOB(bd.postX,bd.postY,2,DANMAKU_TYPE_BITMAP,false);
 			}
 			for(int in=0;in<enemy.size();in++){
 				Enemy me=enemy.get(in);
@@ -586,7 +618,7 @@ public class danmaku extends View
 				}
 			}
 			if (enemy.size() > 0)
-			{		float[] d=new float[50];
+			{		float[] d=new float[enemy.size()];
 				for (int j=0;j < enemy.size();j++)
 				{
 					d[j] = (float)(Math.sqrt(Math.pow(bd.postY - enemy.get(j).postY, 2) + Math.pow(bd.postX - enemy.get(j).postX, 2)));
@@ -601,8 +633,8 @@ public class danmaku extends View
 					    index = k;
 					}	
 				}
-				bd.vx = (enemy.get(index) .postX - bd.postX) / d[index]*12;
-				bd.vy = (enemy.get(index) .postY  - bd.postY) / d[index]*12;
+				bd.vx = (enemy.get(index) .postX - bd.postX) / d[index]*17;
+				bd.vy = (enemy.get(index) .postY  - bd.postY) / d[index]*17;
 				//canvas.drawText("" + index, 100, 150, paint);	
 			}
 			if (GAME_SITU == isSTART)
@@ -611,6 +643,33 @@ public class danmaku extends View
 				bd.postX = bd.postX + bd.vx;
 				bd.postY = bd.postY + bd.vy;}
 				
+		}
+	}
+	public void drawShotOrBoom(Canvas canvas){
+		for(int k=0;k<1;k++){
+			
+		for(int i=0;i<sOB.size();i++){
+			ShotOrBoom sOb=sOB.get(i);
+			if(GAME_SITU==isSTART){
+				sOb.thereTime++;
+			}
+			if (sOb.Shape==DANMAKU_TYPE_CIRCLE&&!sOb.isForSelf){
+				sOBPaint.setAlpha(255-(int)sOb.thereTime*25);
+				canvas.drawCircle(sOb.postX,sOb.postY,getWidth()/45f,sOBPaint);
+			if(sOb.thereTime>10){
+				sOB.remove(i);
+			}
+			}
+			if(sOb.Shape==DANMAKU_TYPE_BITMAP&&!sOb.isForSelf){
+				int f=(int)sOb.thereTime/2;
+				Bitmap e=Bitmap.createScaledBitmap(exploPng[f], (int)(exploPng[f].getWidth()*sOb.scale), (int)(exploPng[f].getHeight()*sOb.scale), true);
+				canvas.drawBitmap(e,sOb.postX-e.getWidth()/2f,sOb.postY-e.getHeight()/2f,paint);
+				if(sOb.thereTime>18){
+				sOB.remove(i);
+				}
+			
+			}
+		}
 		}
 	}
 	/*---------------增加对象方法----------------*/
@@ -626,6 +685,15 @@ public class danmaku extends View
 		mEnemy.postY = -mEnemy.tietu.getHeight();
 		enemy.add(mEnemy);
 	}
+	public void addSOB(float postX,float postY,float scale,int Shape,boolean isForSelf){
+		ShotOrBoom sob=new ShotOrBoom();
+		sob.postX=postX;
+		sob.postY=postY;
+		sob.Shape=Shape;
+		sob.scale=scale;
+		sob.isForSelf=isForSelf;
+		sOB.add(sob);
+	}
 	public void reSet()
 	{
 		game = 0;
@@ -639,6 +707,13 @@ public class danmaku extends View
 		bonus_list.clear();
 		shotDAnmaku.clear();
 		bomb_list.clear();
+		sOB.clear();
+		text_list.clear();
+		bombTime=false;
+		unBombTime=!bombTime;
+		bombTimeFrame=0;
+		setTop(0);
+		setLeft(0);
 		GAME_SITU = isSTART;
 		game_life = 3;
 		power = 0;
@@ -653,6 +728,7 @@ public class danmaku extends View
 	}
 	public void isShotByEnemy()
 	{if(unBombTime){
+			addSOB(selfX,selfY,1,DANMAKU_TYPE_BITMAP,false);
 		game_life = game_life - 1;
 		if (game_life <= 0)
 		{
