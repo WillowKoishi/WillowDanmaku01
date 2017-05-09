@@ -16,36 +16,7 @@ float p,s,e;
         setContentView(R.layout.main);
 		h.postDelayed(r,1);
 		danmaku=(danmaku)this.findViewById(R.id.danmaku);
-		danmaku.setOnTouchListener(new OnTouchListener(){	
-		int i=0;
-		float onTouchX,onTouchY,x,y;
-				@Override
-				public boolean onTouch(View p1, MotionEvent p2)
-				{if(p2.getAction()==p2.ACTION_DOWN&&danmaku.GAME_SITU==danmaku.isSTART
-				&&!danmaku.no_enemy){
-				if(i==0){
-					i=1;
-					onTouchX=p2.getX();
-					onTouchY=p2.getY();
-					x=danmaku.selfX;
-					y=danmaku.selfY;
-				}		
-				}
-				if(p2.getAction()==p2.ACTION_UP){
-					i=0;
-				}
-				if(p2.getAction()==p2.ACTION_MOVE&&i!=0
-				&&danmaku.GAME_SITU==danmaku.isSTART
-				&&!danmaku.no_enemy){
-					danmaku.selfX=x+(p2.getX()-onTouchX)*1.1f;
-					danmaku.selfY=y+(p2.getY()-onTouchY)*1.1f;
-				}
-					// TODO: Implement this method
-					
-					return !danmaku.no_enemy;
-				}
-			});
-    }
+		}
 	public void start(View v){
 		danmaku.GAME_SITU=danmaku.isSTART;
 	}
@@ -92,5 +63,36 @@ float p,s,e;
 		// TODO: Implement this method
 		super.onDestroy();
 	}
-	
-}
+
+//	@Override
+//	public boolean dispatchKeyEvent(KeyEvent event)
+//	{int keyCode=event.getKeyCode();
+//		if(keyCode==KeyEvent.KEYCODE_DPAD_DOWN){
+//		danmaku.selfY=danmaku.selfY+danmaku.getHeight()/80f;
+//	}
+//		if(keyCode==KeyEvent.KEYCODE_DPAD_RIGHT){
+//			danmaku.selfX=danmaku.selfX+danmaku.getWidth()/40f;
+//		}
+//		if(keyCode==KeyEvent.KEYCODE_DPAD_UP){
+//			danmaku.selfY=danmaku.selfY-danmaku.getHeight()/80f;
+//		}
+//		if(keyCode==KeyEvent.KEYCODE_DPAD_LEFT){
+//			danmaku.selfX=danmaku.selfX-danmaku.getWidth()/40f;
+//		}
+//		return super.dispatchKeyEvent(event);//super.onKeyDown(keyCode, event);
+//	}
+//
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if(keyCode==KeyEvent.KEYCODE_BACK){
+	{if(danmaku.GAME_SITU==danmaku.isSTART){
+		danmaku.GAME_SITU=danmaku.isPAUSE;}
+		else if(danmaku.GAME_SITU!=danmaku.isDEAD){
+			danmaku.GAME_SITU=danmaku.isSTART;
+		}
+		// TODO: Implement this method
+	}
+	}
+		return false;
+	}
+	}
