@@ -40,9 +40,13 @@ float p,s,e;
 		//}
 		danmaku.secs=danmaku.frame2-p;
 			p=danmaku.frame2;
+			if(danmaku.GAME_SITU==danmaku.isSTART){
+			danmaku.addEnemy();}
 			h.postDelayed(r,1000);
-			danmaku.addEnemy();
 			h.sendEmptyMessage(0);
+			if(danmaku.ChoosedBack){
+				finish();
+			}
 		}
 	};
 	Handler h=new Handler(){

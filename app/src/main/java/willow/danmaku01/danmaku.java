@@ -14,10 +14,10 @@ import willow.danmaku01.danmaku.*;
 import android.graphics.drawable.shapes.*;
 
 public class danmaku extends View
-{private Paint paint,pauseText,pauseText2,textPaint,sOBPaint,bombText,pauseButtonText;
+{private Paint paint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText;
 	public float selfX,selfY,unit,power=0;
 	public long game=0,frame2,no_enemy_time,frame3,score,bombTimeFrame;
-	public int game_life=3,sound,point,allPoint,stage=1,bombLimit,defaultbomb=3;
+	public int game_life,defaultLife=3,sound,point,allPoint,stage=1,bombLimit,defaultbomb=2;
 	public Path earth_sky;
 	boolean b1=true,b2=true,b3=true,b4=true;
 	String[] stageName={"","簡星表面","卡門線邊縁","",""};
@@ -33,7 +33,7 @@ public class danmaku extends View
 	public float frame=1,bg_garss_m;
 	public static final int isSTART=0,isPAUSE=1,isDEAD=2,isTALK=3,DRAWABLE_CANVAS=0,DRAWABLE_BITMAP=1;
 	public int GAME_SITU;
-	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true,useAntiAlias=true;
+	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true,useAntiAlias=true,isChooseBack=false,ChoosedBack=false,isChooseRetry=false;
 	public Context mContext;
 	public Matrix m;
 	public Bitmap[] exploPng;
@@ -88,9 +88,10 @@ public class danmaku extends View
 		soundPool.load(context, R.raw.change, 2);
 		pauseText = new Paint();
 		pauseText.setAntiAlias(useAntiAlias);
-		pauseText.setColor(Color.argb(200, 255, 255, 255));
+		pauseText.setColor(Color.argb(255, 255, 255, 255));
 		pauseText.setTextSize(60);
 		pauseText.setTextAlign(Paint.Align.CENTER);
+		pauseText.setShadowLayer(7,0,0,0xff000000);
 		pauseText.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"));
 		pauseText2 = new Paint();
 		pauseText2.setAntiAlias(useAntiAlias);
@@ -98,6 +99,13 @@ public class danmaku extends View
 		pauseText2.setTextSize(25);
 		pauseText2.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/exoi.ttf"));
 		pauseText2.setShadowLayer(3,0,0,0xff000000);
+		pauseText3=new Paint();
+		pauseText3.setAntiAlias(useAntiAlias);
+		pauseText3.setTextSize(40);
+		pauseText3.setTextAlign(Paint.Align.CENTER);
+		pauseText3.setColor(Color.WHITE);
+		pauseText3.setShadowLayer(5,0,0,0xff000000);
+		pauseText3.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"));
 		textPaint = new Paint();
 		textPaint.setAntiAlias(useAntiAlias);
 		textPaint.setTypeface(Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"));
@@ -117,6 +125,7 @@ public class danmaku extends View
 		bombText.setTextSize(40);
 		bombText.setShadowLayer(5,0,0,0xff000000);
 		bombLimit=defaultbomb;
+		game_life=defaultLife;
 		pauseButtonText=new Paint();
 		pauseButtonText.setTypeface(Typeface.createFromAsset(context.getAssets(),"font/exoi.ttf"));
 		pauseButtonText.setTextSize(40);
@@ -138,7 +147,7 @@ public class danmaku extends View
 			startGame(canvas);}
 		if (GAME_SITU == isPAUSE || GAME_SITU == isDEAD)
 		{
-			pauseGame(canvas);}
+		pauseGame(canvas);}
 		drawText(canvas);
 		drawDialog(canvas);
 		invalidate();
@@ -167,7 +176,9 @@ public class danmaku extends View
 	}
 	/*--------------------游戏运行中--------------------*/
 	public void startGame(Canvas canvas)
-	{if (game == 0)
+	{isChooseRetry=false;
+	isChooseBack=false;
+		if (game == 0)
 		{unit = getHeight() / 100f;
 			selfX = getWidth() / 2f;
 			selfY = getHeight() / 3f * 2f;
@@ -379,15 +390,6 @@ public class danmaku extends View
 		drawBonus(canvas);
 		drawEnemy(canvas);
 		drawShotOrBoom(canvas);
-		if (GAME_SITU == isPAUSE)
-		{
-			canvas.drawText("遊戲暫停", getWidth() / 2f, getHeight() / 3f, pauseText);
-		}
-		else if (GAME_SITU == isDEAD)
-		{
-			canvas.drawText("滿目瘡痍", getWidth() / 2f, getHeight() / 3f, pauseText);
-		}
-
 	} 
 	/*------------------游戏对象----------------------*/
 	public static class Sprite
@@ -734,7 +736,8 @@ public class danmaku extends View
 		sOB.add(sob);
 	}
 	public void reSet()
-	{
+	{selfX = getWidth() / 2f;
+		selfY = getHeight() / 3f * 2f;
 		game = 0;
 		frame2 = 0;
 		frame3 = 0;
@@ -764,6 +767,7 @@ public class danmaku extends View
 		point = 0;
 		allPoint = 0;
 		bombLimit=defaultbomb;
+		game_life=defaultLife;
 		paint.setColor(Color.argb(255, 255, 88, 88));
 	}
 	public void isShotByEnemy()
@@ -822,7 +826,6 @@ public class danmaku extends View
 				//no_enemy_time=0;
 				selfX = getWidth() / 2f;
 				selfY = getHeight() / 4f * 3f;
-
 			}
 		}
 	}
@@ -866,7 +869,6 @@ public class danmaku extends View
 			//mBonus.BONUS_TYPE=mBonus.D;
 			//bonus_list.add(mBonus);
 		}
-
 	}
 	public void showText(String text, long showTime, long saveTime)
 	{
@@ -887,7 +889,6 @@ public class danmaku extends View
 	}
 	public void addBomb()
 	{
-
 		BombDanmaku bd=new BombDanmaku();
 		bd.tietu = bombshot;
 		bd.postY = selfY;
@@ -901,14 +902,12 @@ public class danmaku extends View
 	{//判断旋转后的敌机弹幕与自机的碰撞
 		float A=-(float)Math.tan((thylta + 90) / 180 * Math.PI);
 		float C=-py - A * px;
-		float re1=(float)(Math.abs(A * xm + ym + C)) / ((float)Math.sqrt(A * A + 1));
-//两点距离公式
+		float re1=(float)(Math.abs(A * xm + ym + C)) / ((float)Math.sqrt(A * A + 1));//两点距离公式
 		float A2=-(float)Math.tan((thylta) / 180 * Math.PI);
 		float C2=-py - A2 * px;
 		float re2=(float)(Math.abs(A2 * xm + ym + C2)) / ((float)Math.sqrt(A2 * A2 + 1));
-		boolean isShot=re1 < bitmap.getWidth() / 2f && re2 < bitmap.getHeight() / 2f;
-		//String s=A+","+C+"/"+re1+","+re2+isShot;
-		return isShot;}
+		return (re1 < bitmap.getWidth() / 2f && re2 < bitmap.getHeight() / 2f);
+		}
 	public void onDea()//释放资源
 	{
 		soundPool.release();
@@ -921,7 +920,9 @@ public class danmaku extends View
 		dian.recycle();
 		pOwer.recycle();
 		jmp.recycle();
-		exploPng = null;
+		for(int ii=0;ii<exploPng.length;ii++){
+			exploPng[ii].recycle();
+		}
 		lmp.recycle();
 		bg_grass.recycle();
 	}
@@ -969,7 +970,26 @@ public class danmaku extends View
 		else{
 			bombText.setColor(0xff00ff33);
 		}
-
+		if (GAME_SITU == isPAUSE)
+		{
+			canvas.drawText("遊戲暫停", getWidth() / 2f, getHeight() / 3f, pauseText);
+			if(!isChooseBack&&!isChooseRetry){
+				canvas.drawText("繼續遊戲", getWidth() / 2f, getHeight() / 2f, pauseText3);
+				canvas.drawText("從頭開始遊戲", getWidth() / 2f, getHeight() / 2f+75, pauseText3);
+				canvas.drawText("返回至標題界面", getWidth() / 2f, getHeight() / 2f+150, pauseText3);
+			}
+			if(isChooseBack||isChooseRetry){
+				canvas.drawText("真的要這樣做麼?", getWidth() / 2f, getHeight() / 2f, pauseText3);
+				canvas.drawText("確定", getWidth() / 2f, getHeight() / 2f+75, pauseText3);
+				canvas.drawText("取消", getWidth() / 2f, getHeight() / 2f+150, pauseText3);
+			}
+		}
+		else if (GAME_SITU == isDEAD)
+		{
+			canvas.drawText("滿目瘡痍", getWidth() / 2f, getHeight() / 3f, pauseText);
+			canvas.drawText("從頭開始遊戲", getWidth() / 2f, getHeight() / 2f, pauseText3);
+			canvas.drawText("返回至標題界面", getWidth() / 2f, getHeight() / 2f+75, pauseText3);
+		}
 	}
 	private void onDialog(MotionEvent p2)
 	{
@@ -977,13 +997,59 @@ public class danmaku extends View
 			if(p2.getX()<=getWidth()&&
 			p2.getX()>=(getWidth()/5f*4f)&&
 			p2.getY()>=getHeight()-80&&
-			bombLimit>0&&unBombTime){
+			bombLimit>0&&unBombTime&&GAME_SITU==isSTART){
 				bombTime=true;
 				bombLimit--;
 			}
 			if(p2.getX()>=getWidth()/6f*5f&&
 			p2.getY()<=80){
 				GAME_SITU=isPAUSE;
+			}
+			if(p2.getY()>=getHeight()/2f-25&&
+			p2.getY()<=getHeight()/2f+50){
+				if(GAME_SITU==isPAUSE&&!isChooseBack){
+					GAME_SITU=isSTART;		
+				}
+				else if(GAME_SITU==isDEAD){
+					reSet();
+				}
+			}
+			if(p2.getY()>=getHeight()/2f+50&&
+			p2.getY()<=getHeight()/2f+125){
+				if(GAME_SITU==isPAUSE){
+					if(!isChooseBack){
+					if(!isChooseRetry){
+				isChooseRetry=true;
+				}
+				else if(isChooseRetry){
+					reSet();
+					isChooseRetry=false;
+				}
+				}
+				if(isChooseBack&&!isChooseRetry){
+					ChoosedBack=true;
+				}
+				}
+				else if(GAME_SITU==isDEAD){
+					ChoosedBack=true;
+				}
+			}
+			if(p2.getY()>=getHeight()/2f+125&&
+			p2.getY()<=getHeight()/2f+200){
+				if(GAME_SITU==isPAUSE){
+				if(isChooseRetry){
+					isChooseRetry=false;
+					isChooseBack=false;
+				}else
+				if(isChooseBack){
+					isChooseBack=false;
+					isChooseRetry=false;
+				}else
+				 if(!isChooseBack&&!isChooseRetry){
+					 isChooseBack=true;
+					 isChooseRetry=false;
+				 }
+				}
 			}
 		}
 	}
