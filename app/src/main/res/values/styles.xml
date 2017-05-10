@@ -6,4 +6,10 @@
         <item name="colorAccent">@color/colorAccent</item>
 		<item name="android:windowContentTransitions">true</item>
 	</style>
+	<style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
+		<item name="colorPrimary">@color/colorPrimary2</item>
+        <item name="colorPrimaryDark">@color/colorPrimary2</item>
+        <item name="colorAccent">@color/colorAccent</item>
+		<item name="android:windowContentTransitions">true</item>
+	</style>
 </resources>

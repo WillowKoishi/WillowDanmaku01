@@ -1,4 +1,4 @@
-package willow.danmaku01;
+package willow.danmaku01.view;
 import android.view.*;
 import android.content.*;
 import android.util.*;
@@ -10,7 +10,7 @@ import android.media.*;
 import android.text.method.*;
 import java.io.*;
 import android.os.*;
-import willow.danmaku01.danmaku.*;
+import willow.danmaku01.R;
 import android.graphics.drawable.shapes.*;
 
 public class danmaku extends View
@@ -36,35 +36,36 @@ public class danmaku extends View
 	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true,useAntiAlias=true,isChooseBack=false,ChoosedBack=false,isChooseRetry=false;
 	public Context mContext;
 	public Matrix m;
+	public Bitmap nmp,kmp,imp,hmp,gmp,fmp,dmp,cmp,bmp,zmp;
 	public Bitmap[] exploPng;
 	int i=0;
 	float onTouchX,onTouchY,x,y;
 	//private MediaPlayer sound_explo;
-	private SoundPool soundPool;
+	public SoundPool soundPool;
 	public void init(Context context)//初始化游戏资源
 	{m = new Matrix();
-		Bitmap nmp=((BitmapDrawable)getResources().getDrawable(R.drawable.loser)).getBitmap();
+		nmp=((BitmapDrawable)getResources().getDrawable(R.drawable.loser)).getBitmap();
 		mmp = Bitmap.createScaledBitmap(nmp, nmp.getWidth() / 6, nmp.getHeight() / 6, true); 
 		lmp = ((BitmapDrawable)getResources().getDrawable(R.drawable.power0)).getBitmap();
-		Bitmap kmp=((BitmapDrawable)getResources().getDrawable(R.drawable.smearthgrass)).getBitmap();
+		 kmp=((BitmapDrawable)getResources().getDrawable(R.drawable.smearthgrass)).getBitmap();
 		bg_grass = Bitmap.createScaledBitmap(kmp, kmp.getWidth() / 2, kmp.getHeight() / 2, true);
 		jmp = ((BitmapDrawable)getResources().getDrawable(R.drawable.earth_sky_background)).getBitmap();
-		Bitmap imp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy1)).getBitmap();
+		imp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy1)).getBitmap();
 		enemy1 = Bitmap.createScaledBitmap(imp, imp.getWidth() / 5, imp.getHeight() / 5, true);
-		Bitmap hmp=((BitmapDrawable)getResources().getDrawable(R.drawable.i)).getBitmap();
+		hmp=((BitmapDrawable)getResources().getDrawable(R.drawable.i)).getBitmap();
 		dian = Bitmap.createScaledBitmap(hmp, hmp.getWidth() / 2, hmp.getHeight() / 2, true);
-		Bitmap gmp=((BitmapDrawable)getResources().getDrawable(R.drawable.p)).getBitmap();
+		 gmp=((BitmapDrawable)getResources().getDrawable(R.drawable.p)).getBitmap();
 		pOwer = Bitmap.createScaledBitmap(gmp, gmp.getWidth() / 2, gmp.getHeight() / 2, true);
-		Bitmap fmp=((BitmapDrawable)getResources().getDrawable(R.drawable.b)).getBitmap();
+		fmp=((BitmapDrawable)getResources().getDrawable(R.drawable.b)).getBitmap();
 		bomb = Bitmap.createScaledBitmap(fmp, fmp.getWidth() / 2, fmp.getHeight() / 2, true);
 		emp = ((BitmapDrawable)getResources().getDrawable(R.drawable.power1)).getBitmap();
-		Bitmap dmp=((BitmapDrawable)getResources().getDrawable(R.drawable.f)).getBitmap();
+		dmp=((BitmapDrawable)getResources().getDrawable(R.drawable.f)).getBitmap();
 		finalB = Bitmap.createScaledBitmap(dmp, dmp.getWidth() / 2, dmp.getHeight() / 2, true);
-		Bitmap cmp=((BitmapDrawable)getResources().getDrawable(R.drawable.bomb)).getBitmap();
+		cmp=((BitmapDrawable)getResources().getDrawable(R.drawable.bomb)).getBitmap();
 		bombshot = Bitmap.createScaledBitmap(cmp, cmp.getWidth() / 4, cmp.getHeight() / 4, true);
-		Bitmap bmp=((BitmapDrawable)getResources().getDrawable(R.drawable.fire)).getBitmap();
+		bmp=((BitmapDrawable)getResources().getDrawable(R.drawable.fire)).getBitmap();
 		fire = Bitmap.createScaledBitmap(bmp, bmp.getWidth() / 5, bmp.getHeight() / 5, true);
-		Bitmap zmp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy2)).getBitmap();
+		zmp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy2)).getBitmap();
 		enemy2 = Bitmap.createScaledBitmap(zmp, zmp.getWidth() / 7, zmp.getHeight() / 7, true);
 		//加载游戏音效
 		exploPng = new Bitmap[10];
@@ -912,7 +913,8 @@ public class danmaku extends View
 	{
 		soundPool.release();
 		mmp.recycle();
-		shot.recycle();
+		if(shot!=null){
+		shot.recycle();}
 		enemy.clear();
 		enemy1.recycle();
 		bonus_list.clear();
@@ -925,6 +927,27 @@ public class danmaku extends View
 		}
 		lmp.recycle();
 		bg_grass.recycle();
+		lmp.recycle();
+		enemy1.recycle();
+		jmp.recycle();
+		nmp.recycle();
+		kmp.recycle();
+		imp.recycle();
+		hmp.recycle();
+		gmp.recycle();
+		fmp.recycle();
+		dmp.recycle();
+		cmp.recycle();
+		bmp.recycle();
+		zmp.recycle();
+		enemy2.recycle();
+		if(shot1!=null){
+			shot1.recycle();
+		}
+		emp.recycle();
+		finalB.recycle();
+		bombshot.recycle();
+		fire.recycle();
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent p2)

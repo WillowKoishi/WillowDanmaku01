@@ -1,54 +1,56 @@
 package willow.danmaku01;
-
-import android.app.*;
+import android.support.v7.app.*;
 import android.os.*;
+import willow.danmaku01.view.*;
 import android.view.View.*;
 import android.view.*;
-import android.support.v7.app.*;
+import android.content.*;
 
 public class MainActivity extends AppCompatActivity
-{danmaku danmaku;
-float p,s,e;
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {setTheme(R.style.AppTheme);
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+{
+MainMenu mm;
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		// TODO: Implement this method
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
+		mm=(MainMenu)this.findViewById(R.id.mm);
 		h.postDelayed(r,1);
-		danmaku=(danmaku)this.findViewById(R.id.danmaku);
-		}
-	public void start(View v){
-		danmaku.GAME_SITU=danmaku.isSTART;
-	}
-	public void pause(View v){
-		danmaku.GAME_SITU=danmaku.isPAUSE;
-	}
-	public void addenemy(View v){
-		danmaku.reSet();
-		p=0;
-	}
-	public void bomb(View v){
-		if(danmaku.unBombTime){
-		danmaku.bombTime=true;}
-	}
-	Runnable r=new Runnable(){
+//		mm.setOnTouchListener(new OnTouchListener(){
+//
+//				@Override
+//				public boolean onTouch(View p1, MotionEvent p2)
+//				{
+//					if(p2.getY()>=mm.getHeight()/7f*3-30&&
+//					   p2.getY()<=mm.getHeight()/7f*3+30){
 
-		@Override
-		public void run()
-		{//if(danmaku.game_life<=0){
-			//danmaku.GAME_SITU=danmaku.isDEAD;
-		//}
-		danmaku.secs=danmaku.frame2-p;
-			p=danmaku.frame2;
-			if(danmaku.GAME_SITU==danmaku.isSTART){
-			danmaku.addEnemy();}
-			h.postDelayed(r,1000);
-			h.sendEmptyMessage(0);
-			if(danmaku.ChoosedBack){
-				finish();
+//					}
+//					return false;
+//				}
+//			});
+	}
+
+	@Override
+	protected void onDestroy()
+	{System.exit(0);
+		// TODO: Implement this method
+		super.onDestroy();
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)
+	{
+		// TODO: Implement this method
+		if(keyCode==KeyEvent.KEYCODE_BACK&&!mm.loading){
+			if(mm.mainMenuType==mm.lastMenuType){
+			if(mm.mainMenuType==mm.START_CHOOSE_RANK){
+				mm.mainMenuType=mm.MAINMENU;
 			}
 		}
-	};
+		}
+		return true;
+	}
 	Handler h=new Handler(){
 
 		@Override
@@ -57,46 +59,26 @@ float p,s,e;
 			// TODO: Implement this method
 			super.handleMessage(msg);
 		}
-		
+
 	};
 
-	@Override
-	protected void onDestroy()
-	{danmaku.onDea();
-	//System.exit(0);
-		// TODO: Implement this method
-		super.onDestroy();
-	}
+	Runnable r=new Runnable(){
 
-//	@Override
-//	public boolean dispatchKeyEvent(KeyEvent event)
-//	{int keyCode=event.getKeyCode();
-//		if(keyCode==KeyEvent.KEYCODE_DPAD_DOWN){
-//		danmaku.selfY=danmaku.selfY+danmaku.getHeight()/80f;
-//	}
-//		if(keyCode==KeyEvent.KEYCODE_DPAD_RIGHT){
-//			danmaku.selfX=danmaku.selfX+danmaku.getWidth()/40f;
-//		}
-//		if(keyCode==KeyEvent.KEYCODE_DPAD_UP){
-//			danmaku.selfY=danmaku.selfY-danmaku.getHeight()/80f;
-//		}
-//		if(keyCode==KeyEvent.KEYCODE_DPAD_LEFT){
-//			danmaku.selfX=danmaku.selfX-danmaku.getWidth()/40f;
-//		}
-//		return super.dispatchKeyEvent(event);//super.onKeyDown(keyCode, event);
-//	}
-//
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(keyCode==KeyEvent.KEYCODE_BACK){
-	{if(danmaku.GAME_SITU==danmaku.isSTART){
-		danmaku.GAME_SITU=danmaku.isPAUSE;}
-		else if(danmaku.GAME_SITU!=danmaku.isDEAD){
-			danmaku.GAME_SITU=danmaku.isSTART;
+		@Override
+		public void run(){
+			if(mm.chooseRank){
+		startActivity(new Intent(MainActivity.this,Start.class));
+		mm.chooseRank=false;
 		}
+			h.postDelayed(r,1000);
+		}
+	};
+	@Override
+	protected void onStop()
+	{mm.loading=false;
+		mm.loadAlpha=1;		
 		// TODO: Implement this method
+		super.onStop();
 	}
-	}
-		return false;
-	}
-	}
+	
+}
