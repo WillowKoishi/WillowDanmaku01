@@ -6,6 +6,7 @@ import android.view.View.*;
 import android.view.*;
 import android.support.v7.app.*;
 import willow.danmaku01.view.*;
+import android.content.*;
 public class Start extends AppCompatActivity
 {danmaku danmaku;
 float p,s,e;
@@ -13,9 +14,11 @@ float p,s,e;
     protected void onCreate(Bundle savedInstanceState)
     {setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
+		Intent intent=this.getIntent();
         setContentView(R.layout.start);
 		h.postDelayed(r,1);
 		danmaku=(danmaku)this.findViewById(R.id.danmaku);
+		danmaku.rank=intent.getIntExtra("rank",0);
 		}
 	public void start(View v){
 		danmaku.GAME_SITU=danmaku.isSTART;
@@ -66,6 +69,8 @@ float p,s,e;
 	protected void onDestroy()
 	{danmaku.soundPool.release();
 		danmaku.onDea();
+		//System.gc();
+		Runtime.getRuntime().gc();
 		//danmaku=null;
 	//System.exit(0);
 		// TODO: Implement this method
@@ -103,4 +108,12 @@ float p,s,e;
 	}
 		return false;
 	}
+
+	@Override
+	protected void onStop()
+	{danmaku.GAME_SITU=danmaku.isPAUSE;
+		// TODO: Implement this method
+		super.onStop();
+	}
+	
 	}

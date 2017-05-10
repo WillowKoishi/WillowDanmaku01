@@ -14,14 +14,16 @@ import willow.danmaku01.R;
 import android.graphics.drawable.shapes.*;
 
 public class danmaku extends View
-{private Paint paint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText;
+{private Paint paint,rankPaint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText;
 	public float selfX,selfY,unit,power=0;
 	public long game=0,frame2,no_enemy_time,frame3,score,bombTimeFrame;
 	public int game_life,defaultLife=3,sound,point,allPoint,stage=1,bombLimit,defaultbomb=2;
 	public Path earth_sky;
 	boolean b1=true,b2=true,b3=true,b4=true;
 	String[] stageName={"","簡星表面","卡門線邊縁","",""};
-	public int DANMAKU_TYPE_CIRCLE=0,DANMAKU_TYPE_BITMAP=1,DANMAKU_TYPE_RAY=2;
+	String[] rankName={"Easy","Normal","Hard","Lunatic"};
+	int[] rankColor={0xff00ffff9,0xff00dd2c,0xffffa500,0xffff0f00};
+	public int rank,DANMAKU_TYPE_CIRCLE=0,DANMAKU_TYPE_BITMAP=1,DANMAKU_TYPE_RAY=2;
 	public List<shotDanmaku> shotDAnmaku=new ArrayList<shotDanmaku>();
 	public List<Enemy> enemy=new ArrayList<Enemy>();
 	public List<Bonus> bonus_list=new ArrayList<Bonus>();
@@ -38,6 +40,7 @@ public class danmaku extends View
 	public Matrix m;
 	public Bitmap nmp,kmp,imp,hmp,gmp,fmp,dmp,cmp,bmp,zmp;
 	public Bitmap[] exploPng;
+	public Typeface tf;
 	int i=0;
 	float onTouchX,onTouchY,x,y;
 	//private MediaPlayer sound_explo;
@@ -68,6 +71,7 @@ public class danmaku extends View
 		zmp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy2)).getBitmap();
 		enemy2 = Bitmap.createScaledBitmap(zmp, zmp.getWidth() / 7, zmp.getHeight() / 7, true);
 		//加载游戏音效
+		tf=Typeface.createFromAsset(context.getAssets(),"font/rev.ttf");
 		exploPng = new Bitmap[10];
 		exploPng[0] = ((BitmapDrawable)getResources().getDrawable(R.drawable.explo0)).getBitmap();
 		exploPng[1] = ((BitmapDrawable)getResources().getDrawable(R.drawable.explo1)).getBitmap();
@@ -87,6 +91,7 @@ public class danmaku extends View
 		soundPool.load(context, R.raw.tip, 7);
 		soundPool.load(context, R.raw.bom, 6);
 		soundPool.load(context, R.raw.change, 2);
+		
 		pauseText = new Paint();
 		pauseText.setAntiAlias(useAntiAlias);
 		pauseText.setColor(Color.argb(255, 255, 255, 255));
@@ -134,6 +139,12 @@ public class danmaku extends View
 		pauseButtonText.setShadowLayer(5,0,0,0xff000000);
 		pauseButtonText.setAntiAlias(useAntiAlias);
 		pauseButtonText.setTextAlign(Paint.Align.RIGHT);
+		rankPaint=new Paint();
+		rankPaint.setTypeface(tf);
+		rankPaint.setTextSize(50);
+		rankPaint.setColor(Color.WHITE);
+		rankPaint.setAntiAlias(useAntiAlias);
+		rankPaint.setTextAlign(Paint.Align.CENTER);
 	}
 	@Override
 	protected void onDraw(Canvas canvas)
@@ -151,7 +162,7 @@ public class danmaku extends View
 		pauseGame(canvas);}
 		drawText(canvas);
 		drawDialog(canvas);
-		invalidate();
+		postInvalidateDelayed(10);
 		super.onDraw(canvas);
 
 	}
@@ -366,7 +377,8 @@ public class danmaku extends View
 		drawSelf(canvas);
 		for (int l=0;l < 2;l++)
 		{
-			drawBonus(canvas);}
+			drawBonus(canvas);
+			}
 		for (int l=0;l < 2;l++)
 		{
 			drawEnemy(canvas); 
@@ -914,40 +926,63 @@ public class danmaku extends View
 		soundPool.release();
 		mmp.recycle();
 		if(shot!=null){
-		shot.recycle();}
+		shot.recycle();
+		shot=null;}
 		enemy.clear();
 		enemy1.recycle();
+		enemy1=null;
 		bonus_list.clear();
 		bomb.recycle();
+		bomb=null;
 		dian.recycle();
+		dian=null;
 		pOwer.recycle();
+		pOwer=null;
 		jmp.recycle();
+		jmp=null;
 		for(int ii=0;ii<exploPng.length;ii++){
 			exploPng[ii].recycle();
+			exploPng[ii]=null;
 		}
 		lmp.recycle();
+		lmp=null;
 		bg_grass.recycle();
-		lmp.recycle();
-		enemy1.recycle();
-		jmp.recycle();
+		bg_grass=null;
 		nmp.recycle();
+		nmp=null;
 		kmp.recycle();
+		kmp=null;
 		imp.recycle();
+		imp=null;
 		hmp.recycle();
+		hmp=null;
 		gmp.recycle();
+		gmp=null;
 		fmp.recycle();
+		fmp=null;
 		dmp.recycle();
+		dmp=null;
 		cmp.recycle();
+		cmp=null;
 		bmp.recycle();
+		bmp=null;
 		zmp.recycle();
+		zmp=null;
 		enemy2.recycle();
+		enemy2=null;
 		if(shot1!=null){
 			shot1.recycle();
+			shot1=null;
 		}
 		emp.recycle();
+		emp=null;
 		finalB.recycle();
+		finalB=null;
 		bombshot.recycle();
+		bombshot=null;
 		fire.recycle();
+		fire=null;
+		Runtime.getRuntime().gc();
 	}
 	@Override
 	public boolean onTouchEvent(MotionEvent p2)
@@ -987,6 +1022,8 @@ public class danmaku extends View
 		canvas.drawText("Spell:" + bombLimit , 0, getHeight() - 110, pauseText2);
 		canvas.drawText("「Bomb」",getWidth(),getHeight()-20,bombText);
 		canvas.drawText("Pause ",getWidth(),45,pauseButtonText);
+		rankPaint.setShadowLayer(8,0,0,rankColor[rank]);
+		canvas.drawText(rankName[rank],getWidth()/2f,50,rankPaint);
 		if(bombLimit<=0){
 			bombText.setColor(0xffaaaaaa);
 		}
@@ -1028,8 +1065,8 @@ public class danmaku extends View
 			p2.getY()<=80){
 				GAME_SITU=isPAUSE;
 			}
-			if(p2.getY()>=getHeight()/2f-25&&
-			p2.getY()<=getHeight()/2f+50){
+			if(p2.getY()>=getHeight()/2f-30&&
+			p2.getY()<=getHeight()/2f+10){
 				if(GAME_SITU==isPAUSE&&!isChooseBack){
 					GAME_SITU=isSTART;		
 				}
@@ -1037,8 +1074,8 @@ public class danmaku extends View
 					reSet();
 				}
 			}
-			if(p2.getY()>=getHeight()/2f+50&&
-			p2.getY()<=getHeight()/2f+125){
+			if(p2.getY()>=getHeight()/2f+30&&
+			p2.getY()<=getHeight()/2f+95){
 				if(GAME_SITU==isPAUSE){
 					if(!isChooseBack){
 					if(!isChooseRetry){
@@ -1057,8 +1094,8 @@ public class danmaku extends View
 					ChoosedBack=true;
 				}
 			}
-			if(p2.getY()>=getHeight()/2f+125&&
-			p2.getY()<=getHeight()/2f+200){
+			if(p2.getY()>=getHeight()/2f+115&&
+			p2.getY()<=getHeight()/2f+155){
 				if(GAME_SITU==isPAUSE){
 				if(isChooseRetry){
 					isChooseRetry=false;

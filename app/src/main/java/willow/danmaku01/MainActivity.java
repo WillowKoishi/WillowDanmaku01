@@ -42,10 +42,13 @@ MainMenu mm;
 	public boolean onKeyDown(int keyCode, KeyEvent event)
 	{
 		// TODO: Implement this method
-		if(keyCode==KeyEvent.KEYCODE_BACK&&!mm.loading){
+		if(keyCode==KeyEvent.KEYCODE_BACK&&!mm.loading&&event.getAction()==event.ACTION_DOWN){
 			if(mm.mainMenuType==mm.lastMenuType){
 			if(mm.mainMenuType==mm.START_CHOOSE_RANK){
 				mm.mainMenuType=mm.MAINMENU;
+			}
+			if(mm.mainMenuType==mm.MAINMENU&&mm.lastMenuType==mm.MAINMENU){
+				mm.antiReShow();
 			}
 		}
 		}
@@ -66,11 +69,16 @@ MainMenu mm;
 
 		@Override
 		public void run(){
-			if(mm.chooseRank){
-		startActivity(new Intent(MainActivity.this,Start.class));
+			if(mm.chooseRank&&mm.loading){
+		Intent intent= new Intent(MainActivity.this,Start.class);
+		intent.putExtra("rank",mm.rank);
+		startActivity(intent);
 		mm.chooseRank=false;
 		}
-			h.postDelayed(r,1000);
+		if(mm.antiReShow&&mm.reShowMove<-mm.getHeight()){
+			finish();
+		}
+			h.postDelayed(r,10);
 		}
 	};
 	@Override
@@ -79,6 +87,13 @@ MainMenu mm;
 		mm.loadAlpha=1;		
 		// TODO: Implement this method
 		super.onStop();
+	}
+
+	@Override
+	protected void onResume()
+	{mm.reShow();
+		// TODO: Implement this method
+		super.onResume();
 	}
 	
 }
