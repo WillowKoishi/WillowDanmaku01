@@ -14,7 +14,7 @@ public class MainMenu extends View
 	public float mainMenuMove=0,a=0,rankMove=0;
 	public float reShowMove;
 	public int mainMenuType=0,lastMenuType=0,rank,loadAlpha=1;
-	public Bitmap back,star;
+	public Bitmap back,back2,star,n1;
 	public static final int MAINMENU=0,START_CHOOSE_RANK=1,EXTRA_START=2,PRA_START=3,SCORE=4,SETTING=5;
 	public MainMenu(Context context)
 	{
@@ -34,6 +34,7 @@ public class MainMenu extends View
 	{mainMenuType = MAINMENU;
 		lastMenuType = MAINMENU;
 		back = ((BitmapDrawable)getResources().getDrawable(R.drawable.start_back)).getBitmap();
+		back2 = ((BitmapDrawable)getResources().getDrawable(R.drawable.n1)).getBitmap();
 		tf = Typeface.createFromAsset(context.getAssets(), "font/bur.ttf");
 		tf2 = Typeface.createFromAsset(context.getAssets(), "font/ttc.ttc"); 
 		tf3 = Typeface.createFromAsset(context.getAssets(), "font/exoi.ttf");
@@ -114,8 +115,10 @@ public class MainMenu extends View
 		loadPaintCN.setTextSize(70);
 		loadPaintCN.setTextAlign(Paint.Align.CENTER);
 		loadPaintCN.setColor(0xffffffff);
+		loadPaintCN.setAlpha(1);
 		loadPaintCN.setShadowLayer(7, 0, 0, 0xff000000);
 		loadPaint = new Paint();
+		loadPaint.setAlpha(1);
 		loadPaint.setAntiAlias(useAntiAlias);
 		loadPaint.setTypeface(tf4);
 		loadPaint.setTextSize(50);
@@ -131,6 +134,7 @@ public class MainMenu extends View
 		rankMove = getHeight();
 		reShowMove = getHeight();
 		star = Bitmap.createScaledBitmap(back, getHeight(), getHeight() , true);
+		n1 = Bitmap.createScaledBitmap(back2,(int)(getHeight()/497f*385f), getHeight(), true);
 		super.onLayout(changed, left, top, right, bottom);
 	}
 
@@ -178,12 +182,16 @@ public class MainMenu extends View
 			{
 				loadAlpha = loadAlpha + 10;
 			}
-			else
+			else if(loadAlpha>=250)
 			{
 				loadAlpha = 255;
 			}
 			loadPaintCN.setAlpha(loadAlpha);
 			loadPaint.setAlpha(loadAlpha);
+		}
+		else{
+			loadPaintCN.setAlpha(0);
+			loadPaint.setAlpha(0);
 		}
 		if (reShow)
 		{
@@ -238,9 +246,10 @@ public class MainMenu extends View
 		}
 		if (loading)
 		{
-			canvas.drawColor(Color.argb(loadAlpha, 150, 150, 150));
-			canvas.drawText("火箭折壽中", getWidth() / 2f, getHeight() / 3f * 2, loadPaintCN);
-			canvas.drawText("Now Loading...", getWidth() / 2f + 50, getHeight() / 3f * 2 + 20, loadPaint);
+			//canvas.drawColor(Color.argb(loadAlpha, 150, 150, 150));
+			canvas.drawBitmap(n1,-30,0,loadPaint);
+			canvas.drawText("火箭折壽中", getWidth() / 2f, getHeight() / 5f * 4, loadPaintCN);
+			canvas.drawText("Now Loading...", getWidth() / 2f + 60, getHeight() / 5f * 4 + 20, loadPaint);
 		}
 	}
 	@Override
@@ -311,6 +320,7 @@ public class MainMenu extends View
 					h.postDelayed(r2, 1000);
 					rank = 3;
 					loading = true;	
+					
 				}
 			}
 		}

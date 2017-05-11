@@ -22,6 +22,7 @@
         </activity>
 		<activity
             android:name=".Start"
+			android:hardwareAccelerated="true"
 			android:screenOrientation="portrait"
 			android:theme="@style/AppTheme"
             android:label="Start" >

@@ -44,8 +44,9 @@ float p,s,e;
 		if(!danmaku.ChoosedBack){
 		danmaku.secs=danmaku.frame2-p;
 			p=danmaku.frame2;
-			if(danmaku.GAME_SITU==danmaku.isSTART){
-			danmaku.addEnemy();}
+			//if(danmaku.GAME_SITU==danmaku.isSTART){
+			//danmaku.addEnemy();
+			//}
 			h.postDelayed(r,1000);
 			h.sendEmptyMessage(0);
 			}
