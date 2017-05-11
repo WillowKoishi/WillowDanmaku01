@@ -14,7 +14,7 @@ import willow.danmaku01.R;
 import android.graphics.drawable.shapes.*;
 
 public class danmaku extends View
-{private Paint paint,rankPaint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText;
+{private Paint paint,rankPaint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText,circleDanmaku;
 	public float selfX,selfY,unit,power=0;
 	public long game=0,frame2,no_enemy_time,frame3,score,bombTimeFrame;
 	public int game_life,defaultLife=3,sound,point,allPoint,stage=1,bombLimit,defaultbomb=2;
@@ -162,6 +162,8 @@ public static String[] hath={
 		rankPaint.setColor(Color.WHITE);
 		rankPaint.setAntiAlias(useAntiAlias);
 		rankPaint.setTextAlign(Paint.Align.CENTER);
+		circleDanmaku=new Paint();
+		circleDanmaku.setAntiAlias(useAntiAlias);
 	}
 	@Override
 	protected void onDraw(Canvas canvas)
@@ -300,7 +302,7 @@ public static String[] hath={
 				setLeft(0);
 			}
 		}
-		if (frame == 8)
+		if (frame == 9)
 		{
 			frame = 1;
 		}
@@ -403,6 +405,8 @@ public static String[] hath={
 			drawEnemy(canvas); 
 		}
 		drawShotOrBoom(canvas);
+		drawEnemyDanmaku(canvas);
+		drawEnemyDanmaku(canvas);
 	}
 	/*------------------游戏暂停或死亡----------------------*/
 	private void pauseGame(Canvas canvas)
@@ -422,6 +426,8 @@ public static String[] hath={
 		drawBonus(canvas);
 		drawEnemy(canvas);
 		drawShotOrBoom(canvas);
+		drawEnemyDanmaku(canvas);
+		drawEnemyDanmaku(canvas);
 	} 
 	/*------------------游戏对象----------------------*/
 	public static class Sprite
@@ -443,11 +449,8 @@ public static String[] hath={
 		float bonus=0.1f;	
 		boolean isBoss=false;
 		public float littleBonus=0;
-
 		public boolean autoDead;
-
 		public int group;
-
 		public float rota;
 	}
 	public class Bonus extends Sprite
@@ -478,8 +481,11 @@ public static String[] hath={
 	{
 		int Shape=DANMAKU_TYPE_CIRCLE;
 		float range;
-		boolean autoRato=false;
-		int color=0xffffa8a2;
+		int group;
+		boolean autoRato=false,autoDead=true;
+		int color=0xffffc8c2;
+		int faceColor=0xffff382b;
+		public boolean autoMove=true;
 	}
 	public class ShotOrBoom extends Sprite
 	{
@@ -796,6 +802,7 @@ public static String[] hath={
 		shotDAnmaku.clear();
 		bomb_list.clear();
 		sOB.clear();
+		enemy_danmaku_list.clear();
 		text_list.clear();
 		bombTime = false;
 		unBombTime = !bombTime;
@@ -1146,6 +1153,37 @@ public static String[] hath={
 			}
 		}
 	}
+	private void drawEnemyDanmaku(Canvas canvas){
+		for(int ii=0;ii<enemy_danmaku_list.size();ii++){
+			EnemyDanmaku ed=enemy_danmaku_list.get(ii);
+			if(ed.Shape==DANMAKU_TYPE_CIRCLE){
+				circleDanmaku.setColor(ed.faceColor);
+				canvas.drawCircle(ed.postX,ed.postY,ed.range+3,circleDanmaku);
+				circleDanmaku.setColor(ed.color);
+				canvas.drawCircle(ed.postX,ed.postY,ed.range,circleDanmaku);
+				if(GAME_SITU==isSTART&&ed.autoMove){
+					ed.postX=ed.postX+ed.vx+ed.ax*ed.thereTime;
+					ed.postY=ed.postY+ed.vy+ed.ay*ed.thereTime;
+				}
+				if(ed.autoDead&&ed.postX<-ed.range||
+				ed.postX>getWidth()+ed.range||
+				ed.postY<-ed.range||
+				ed.postY>getHeight()+ed.range){
+					ed.isDEAD=true;
+				}
+				if(Math.sqrt(Math.pow(selfY-ed.postY,2)+Math.pow(selfX-ed.postX,2))<ed.range&&!no_enemy){
+					isShotByEnemy();
+					ed.isDEAD=true;
+				}
+				if(Math.sqrt(Math.pow(selfY-ed.postY,2)+Math.pow(selfX-ed.postX,2))<getWidth()/3f&&(no_enemy||bombTime)){
+					ed.isDEAD=true;
+				}
+				if(ed.isDEAD){
+					enemy_danmaku_list.remove(ii);
+				}
+			}
+		}
+	}
 	private void onStage(){
 		if(stage==1){
 		if(frame3>=320&&
@@ -1202,6 +1240,15 @@ public static String[] hath={
 						if(e.postY>=getHeight()/5f*2){
 							e.vx=0;
 							e.vy=getHeight()/500f;
+						}
+						if(frame3%(80-rank*15)==0){
+							EnemyDanmaku ed=new EnemyDanmaku();
+							ed.postX=e.postX;
+							ed.postY=e.postY;
+							ed.vx=(selfX-e.postX)/getWidth()*(3+0.4f*rank);//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
+							ed.vy=(selfY-e.postY)/getWidth()*(3+0.4f*rank);//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
+							ed.range=getWidth()/75f;
+							enemy_danmaku_list.add(ed);
 						}
 					}
 				}

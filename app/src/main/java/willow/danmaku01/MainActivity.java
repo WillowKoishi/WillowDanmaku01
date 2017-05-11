@@ -95,5 +95,12 @@ MainMenu mm;
 		// TODO: Implement this method
 		super.onResume();
 	}
+
+	@Override
+	protected void onStart()
+	{mm.reShow();
+		// TODO: Implement this method
+		super.onStart();
+	}
 	
 }
