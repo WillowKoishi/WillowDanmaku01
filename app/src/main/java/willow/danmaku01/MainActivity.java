@@ -52,7 +52,7 @@ MainMenu mm;
 			}
 		}
 		}
-		return true;
+		return false;
 	}
 	Handler h=new Handler(){
 
@@ -102,5 +102,4 @@ MainMenu mm;
 		// TODO: Implement this method
 		super.onStart();
 	}
-	
 }

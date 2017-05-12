@@ -248,7 +248,7 @@ public class MainMenu extends View
 		{
 			//canvas.drawColor(Color.argb(loadAlpha, 150, 150, 150));
 			canvas.drawBitmap(n1,-30,0,loadPaint);
-			canvas.drawText("火箭折壽中", getWidth() / 2f, getHeight() / 5f * 4, loadPaintCN);
+			canvas.drawText("火箭折寿中", getWidth() / 2f, getHeight() / 5f * 4, loadPaintCN);
 			canvas.drawText("Now Loading...", getWidth() / 2f + 60, getHeight() / 5f * 4 + 20, loadPaint);
 		}
 	}

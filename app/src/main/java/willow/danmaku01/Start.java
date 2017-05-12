@@ -112,7 +112,8 @@ float p,s,e;
 
 	@Override
 	protected void onStop()
-	{danmaku.GAME_SITU=danmaku.isPAUSE;
+	{
+		danmaku.GAME_SITU=danmaku.isPAUSE;
 		// TODO: Implement this method
 		super.onStop();
 	}
