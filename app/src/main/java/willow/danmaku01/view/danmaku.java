@@ -68,6 +68,7 @@ public static String[] hath={
 	public void init(Context context)//初始化游戏资源
 	{m = new Matrix();
 		nmp=((BitmapDrawable)getResources().getDrawable(R.drawable.loser)).getBitmap();
+		//nmp.setConfig(Bitmap.Config.ARGB_4444);
 		mmp = Bitmap.createScaledBitmap(nmp, nmp.getWidth() / 2, nmp.getHeight() / 2, true); 
 		lmp = ((BitmapDrawable)getResources().getDrawable(R.drawable.power0)).getBitmap();
 		 kmp=((BitmapDrawable)getResources().getDrawable(R.drawable.smearthgrass)).getBitmap();
@@ -113,7 +114,7 @@ public static String[] hath={
 		soundPool.load(context, R.raw.tip, 7);
 		soundPool.load(context, R.raw.bom, 6);
 		soundPool.load(context, R.raw.change, 2);
-		
+		soundPool.play(1,0,0,0,0,0);
 		pauseText = new Paint();
 		pauseText.setAntiAlias(useAntiAlias);
 		pauseText.setColor(Color.argb(255, 255, 255, 255));
@@ -649,7 +650,7 @@ public static String[] hath={
 						soundPool.play(4, 1, 1, 0, 0, 1);
 						if (power < 4)
 						{
-							power = power + (float)(0.05* Math.random()+0.008f*rank);}
+							power = power + (float)(0.05* Math.random()+0.009f*rank);}
 						score = score + 10+10*rank;
 						break;
 					case mBonus.B:
@@ -1112,7 +1113,7 @@ public static String[] hath={
 	}
 	private void onDialog(MotionEvent p2)
 	{
-		if(p2.getAction()==p2.ACTION_DOWN){
+		if(p2.getAction()==p2.ACTION_UP){
 			if(p2.getX()<=getWidth()&&
 			p2.getX()>=(getWidth()/5f*4f)&&
 			p2.getY()>=getHeight()-80&&
@@ -1184,10 +1185,10 @@ public static String[] hath={
 					ed.postX=ed.postX+ed.vx+ed.ax*ed.thereTime;
 					ed.postY=ed.postY+ed.vy+ed.ay*ed.thereTime;
 				}
-				if(ed.autoDead&&ed.postX<-ed.range||
+				if(ed.autoDead&&(ed.postX<-ed.range||
 				ed.postX>getWidth()+ed.range||
 				ed.postY<-ed.range||
-				ed.postY>getHeight()+ed.range){
+				ed.postY>getHeight()+ed.range)){
 					ed.isDEAD=true;
 				}
 				if(Math.sqrt(Math.pow(selfY-ed.postY,2)+Math.pow(selfX-ed.postX,2))<ed.range&&!no_enemy){
@@ -1268,7 +1269,7 @@ public static String[] hath={
 							EnemyDanmaku ed=new EnemyDanmaku();
 							ed.postX=e.postX;
 							ed.postY=e.postY;
-							ed.color=0xffffeeee;
+							ed.color=0xffffefef;
 							ed.vx=(selfX-e.postX)/getWidth()*(3+0.4f*rank)*2;//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
 							ed.vy=(selfY-e.postY)/getWidth()*(3+0.4f*rank)*2;//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
 							ed.range=getWidth()/75f;
@@ -1307,9 +1308,33 @@ public static String[] hath={
 				ee.vy=getHeight()/1100f;
 				enemy.add(ee);
 			}
+			if(frame3>=1100&&frame3%(50-8*rank)==0&&frame3<=1200+rank*100){
+				for(int j=0;j<enemy.size();j++){
+					Enemy e=enemy.get(j);
+					if(e.group==2){
+						addMultiCircleDanmaku(getWidth()/60f*(1+0.6f*rank),20+6*rank,e.postX,e.postY,1+(0.9f*rank),frame3/(50-8*rank)*((float)Math.PI/16f));
+					}
+				}
+			}
 			//
 		}
 	}
-	
+	public void addMultiCircleDanmaku(float range,float danmakuNum,float postX,float postY,float generalSpeed,float move){
+		float unitAngle=(float)Math.PI/danmakuNum*2;
+		float unitSpeed=getWidth()/300f*generalSpeed;
+		for(int j=0;j<danmakuNum;j++){
+			EnemyDanmaku ed=new EnemyDanmaku();
+			ed.range=range;
+			ed.color=0xffffffff;
+			ed.Shape=DANMAKU_TYPE_CIRCLE;
+			ed.faceColor=0xff60b7ff;
+			ed.postX=postX;
+			ed.postY=postY;
+			ed.vx=unitSpeed*(float)Math.sin(unitAngle*j+move);
+			ed.vy=unitSpeed*(float)Math.cos(unitAngle*j+move);
+			ed.autoDead=true;
+			enemy_danmaku_list.add(ed);
+		}
+	}
 			
 }
