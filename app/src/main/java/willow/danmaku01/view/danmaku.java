@@ -243,7 +243,7 @@ public static String[] hath={
 			paint.setColor(Color.BLUE);
 			no_enemy_time = no_enemy_time + 1;
 		}
-		if (no_enemy_time > 90)
+		if (no_enemy_time > 120)
 		{
 			paint.setColor(Color.argb(255, 255, 88, 88));
 			no_enemy = false;
@@ -521,10 +521,11 @@ public static String[] hath={
 	}
 	private void drawEnemy(Canvas canvas)
 	{
-		for (int i=0;i < enemy.size();i++)
+		for (int ii=0;ii < enemy.size();ii++)
 		{
 
-			Enemy me=enemy.get(i);
+			Enemy me=enemy.get(ii);
+			if(!me.isBoss){
 			if (GAME_SITU == isSTART)
 			{
 				me.postY = me.postY + me.vy + me.ay * me.thereTime;	
@@ -534,11 +535,6 @@ public static String[] hath={
 			m.postRotate(me.rota,me.tietu.getWidth()/2f,me.tietu.getHeight()/2f);
 			m.postTranslate(me.postX - me.tietu.getWidth() / 2f, me.postY - me.tietu.getHeight() / 2f);
 			canvas.drawBitmap(me.tietu, m, paint);
-
-			if (me.isDEAD)
-			{
-				enemy.remove(i);			
-			}
 			if (me.life <= 0)
 			{
 				addBonus(me.littleBonus, me.bonus, me.postX, me.postY);
@@ -547,9 +543,13 @@ public static String[] hath={
 				me.isDEAD = true;
 				addSOB(me.postX, me.postY, me.tietu.getWidth() / 64f, DANMAKU_TYPE_BITMAP, false);
 			}
-			if (me.postY > getHeight() + me.tietu.getHeight() / 2f
+				if (me.isDEAD)
+				{
+					enemy.remove(ii);			
+				}
+			if ((me.postY > getHeight() + me.tietu.getHeight() / 2f
 				|| me.postX < -me.tietu.getWidth()
-				|| me.postX > getWidth() + me.tietu.getWidth()&&me.autoDead)
+				|| me.postX > getWidth() + me.tietu.getWidth())&&me.autoDead)
 			{
 				me.isDEAD = true;
 			}
@@ -592,6 +592,10 @@ public static String[] hath={
 					isShotByEnemy();
 					me.isDEAD = true;
 				}
+			}
+			}
+			if(me.isBoss){
+				
 			}
 		}
 	}
@@ -712,7 +716,7 @@ public static String[] hath={
 					&& bd.postX < me.postX + (me.tietu.getWidth() / 2f)			
 					&& bd.postY < me.postY + (me.tietu.getHeight() / 2f)
 					&& bd.postY > me.postY - (me.tietu.getHeight() / 2f)
-					&& !bd.isDEAD && !me.isDEAD)
+					&& !bd.isDEAD && me.life>0)
 				{
 					me.life = me.life - 10;
 					bd.isDEAD = true;
@@ -1106,14 +1110,14 @@ public static String[] hath={
 		}
 		else if (GAME_SITU == isDEAD)
 		{
-			canvas.drawText("滿目瘡痍", getWidth() / 2f, getHeight() / 3f, pauseText);
+			canvas.drawText("滿身瘡痍", getWidth() / 2f, getHeight() / 3f, pauseText);
 			canvas.drawText("從頭開始遊戲", getWidth() / 2f, getHeight() / 2f, pauseText3);
 			canvas.drawText("返回至標題界面", getWidth() / 2f, getHeight() / 2f+75, pauseText3);
 		}
 	}
 	private void onDialog(MotionEvent p2)
 	{
-		if(p2.getAction()==p2.ACTION_UP){
+		if(p2.getAction()==p2.ACTION_DOWN){
 			if(p2.getX()<=getWidth()&&
 			p2.getX()>=(getWidth()/5f*4f)&&
 			p2.getY()>=getHeight()-80&&
@@ -1178,7 +1182,7 @@ public static String[] hath={
 			EnemyDanmaku ed=enemy_danmaku_list.get(ii);
 			if(ed.Shape==DANMAKU_TYPE_CIRCLE){
 				circleDanmaku.setColor(ed.faceColor);
-				canvas.drawCircle(ed.postX,ed.postY,ed.range*1.2f,circleDanmaku);
+				canvas.drawCircle(ed.postX,ed.postY,ed.range*1.3f,circleDanmaku);
 				circleDanmaku.setColor(ed.color);
 				canvas.drawCircle(ed.postX,ed.postY,ed.range,circleDanmaku);
 				if(GAME_SITU==isSTART&&ed.autoMove){
@@ -1312,12 +1316,55 @@ public static String[] hath={
 				for(int j=0;j<enemy.size();j++){
 					Enemy e=enemy.get(j);
 					if(e.group==2){
-						addMultiCircleDanmaku(getWidth()/60f*(1+0.6f*rank),20+6*rank,e.postX,e.postY,1+(0.9f*rank),frame3/(50-8*rank)*((float)Math.PI/16f));
+						addMultiCircleDanmaku(getWidth()/60f*(1+0.5f*rank),20+6*rank,e.postX,e.postY,1+(0.9f*rank),frame3/(50-8*rank)*((float)Math.PI/13f));
 					}
 				}
 			}
-			//
+			if(frame3>=(1500-(rank*100))&&frame3<=2100&&frame3%30==0){
+				Enemy e=new Enemy();
+				e.postX=getWidth()*0.1f;
+				e.tietu=enemy1;
+				e.life=3+rank*1.5f;
+				e.bonus=0.1f;
+				e.postY=-enemy1.getHeight();
+				e.vy=getHeight()/400f;
+				e.littleBonus=0.05f*rank;
+				e.autoDead=true;
+				e.group=3;
+				enemy.add(e);
+				Enemy ei=new Enemy();
+				ei.postX=getWidth()*0.9f;
+				ei.tietu=enemy1;
+				ei.life=3+rank*1.5f;
+				ei.bonus=0.1f;
+				ei.postY=-enemy1.getHeight();
+				ei.vy=getHeight()/400f;
+				ei.littleBonus=0.08f*rank;
+				ei.autoDead=true;
+				ei.group=3;
+				enemy.add(ei);
+			}
+			if(frame3>=(1500-(rank*100))&&frame3<=2100&&frame3%(50-7*rank)==0){
+				for(int ii=0;ii<enemy.size();ii++){
+					Enemy e=enemy.get(ii);
+					if(e.group==3){
+						EnemyDanmaku ed=new EnemyDanmaku();
+						ed.postX=e.postX;
+						ed.postY=e.postY;
+						ed.faceColor=0xff000000|(int)(0x00ff0000*Math.random())|(int)(0x0000ff00*Math.random())|(int)(0x000000ff*Math.random());
+						ed.color=0xffffffff;
+						float θ=(float)Math.atan2(selfX-e.postX,selfY-e.postY);
+						ed.vx=getWidth()/400f*(float)Math.sin(θ)*(1+0.2f*rank);//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
+						ed.vy=getHeight()/400f*(float)Math.cos(θ)*(1+0.2f*rank);//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
+						ed.range=getWidth()/85f;
+						ed.autoDead=true;
+						enemy_danmaku_list.add(ed);
+					}
+				}
+			}
+			//TODO:这里写第一关的敌人和弹幕代码。
 		}
+		//TODO:这里写关卡代码
 	}
 	public void addMultiCircleDanmaku(float range,float danmakuNum,float postX,float postY,float generalSpeed,float move){
 		float unitAngle=(float)Math.PI/danmakuNum*2;

@@ -70,6 +70,7 @@ float p,s,e;
 	protected void onDestroy()
 	{danmaku.soundPool.release();
 		danmaku.onDea();
+		danmaku=null;
 		//System.gc();
 		Runtime.getRuntime().gc();
 		//danmaku=null;
@@ -117,5 +118,4 @@ float p,s,e;
 		// TODO: Implement this method
 		super.onStop();
 	}
-	
 	}
