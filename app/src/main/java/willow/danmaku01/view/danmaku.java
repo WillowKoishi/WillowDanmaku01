@@ -1,17 +1,12 @@
 package willow.danmaku01.view;
-import android.view.*;
 import android.content.*;
-import android.util.*;
 import android.graphics.*;
-import android.view.View.*;
 import android.graphics.drawable.*;
-import java.util.*;
 import android.media.*;
-import android.text.method.*;
-import java.io.*;
-import android.os.*;
-import willow.danmaku01.R;
-import android.graphics.drawable.shapes.*;
+import android.util.*;
+import android.view.*;
+import java.util.*;
+import willow.danmaku01.*;
 
 public class danmaku extends View
 {private Paint paint,rankPaint,pauseText,pauseText2,pauseText3,textPaint,sOBPaint,bombText,pauseButtonText,circleDanmaku;
@@ -32,14 +27,14 @@ public class danmaku extends View
 	public List<ShotOrBoom> sOB=new ArrayList<ShotOrBoom>();
 	public List<EnemyDanmaku> enemy_danmaku_list=new ArrayList<EnemyDanmaku>();
 	public float touchX,touchY,move,pectime,secs,fps;
-	public Bitmap mmp,shot,bg_grass,sky,enemy1,enemy2,enemy3,lmp,jmp,dian,pOwer,bomb,shot1,emp,finalB,bombshot,fire;
+	public Bitmap mmp,shot,bg_grass,sky,sky2space,space,earth,enemy1,enemy2,enemy3,lmp,jmp,dian,pOwer,bomb,shot1,emp,finalB,十1s,bombshot,fire;
 	public float frame=1,bg_garss_m;
 	public static final int isSTART=0,isPAUSE=1,isDEAD=2,isTALK=3,DRAWABLE_CANVAS=0,DRAWABLE_BITMAP=1;
 	public int GAME_SITU;
 	public boolean liftoff=false,no_enemy=false,canShot=true,bombTime=false,unBombTime=true,useAntiAlias=true,isChooseBack=false,ChoosedBack=false,isChooseRetry=false,bossTime=false;
 	public Context mContext;
 	public Matrix m;
-	public Bitmap nmp,kmp,imp,hmp,gmp,fmp,dmp,cmp,bmp,zmp,ymp;
+	public Bitmap nmp,kmp,imp,hmp,gmp,fmp,dmp,cmp,bmp,zmp,ymp,xmp,wmp,vmp,ump;
 	public Bitmap[] exploPng;
 	public Typeface tf;
 	//public Canvas canvas;
@@ -93,6 +88,11 @@ public static String[] hath={
 		enemy2 = Bitmap.createScaledBitmap(zmp, zmp.getWidth() / 3, zmp.getHeight() / 3, true);
 		ymp=((BitmapDrawable)getResources().getDrawable(R.drawable.enemy3)).getBitmap();
 		enemy3 = Bitmap.createScaledBitmap(ymp, ymp.getWidth() / 4, ymp.getHeight() / 4, true);
+		xmp=((BitmapDrawable)getResources().getDrawable(R.drawable.up)).getBitmap();
+		十1s=Bitmap.createScaledBitmap(xmp, xmp.getWidth() / 2, xmp.getHeight() / 2, true);
+		wmp=((BitmapDrawable)getResources().getDrawable(R.drawable.sky2space)).getBitmap();
+		vmp=((BitmapDrawable)getResources().getDrawable(R.drawable.earth)).getBitmap();
+		ump=((BitmapDrawable)getResources().getDrawable(R.drawable.start_back)).getBitmap();
 		//加载游戏音效
 		tf=Typeface.createFromAsset(context.getAssets(),"font/rev.ttf");
 		exploPng = new Bitmap[10];
@@ -107,13 +107,15 @@ public static String[] hath={
 		exploPng[8] = ((BitmapDrawable)getResources().getDrawable(R.drawable.explo8)).getBitmap();
 		exploPng[9] = ((BitmapDrawable)getResources().getDrawable(R.drawable.explo9)).getBitmap();
 		soundPool = new SoundPool(200, AudioManager.STREAM_MUSIC, 5);
-		soundPool.load(context, R.raw.explo, 3);
-		soundPool.load(context, R.raw.pdel, 2);
-		soundPool.load(context, R.raw.pshot, 1);
-		soundPool.load(context, R.raw.item, 4);
-		soundPool.load(context, R.raw.tip, 7);
-		soundPool.load(context, R.raw.bom, 6);
-		soundPool.load(context, R.raw.change, 2);
+		soundPool.load(context, R.raw.explo, 3);//1
+		soundPool.load(context, R.raw.pdel, 2);//2
+		soundPool.load(context, R.raw.pshot, 1);//3
+		soundPool.load(context, R.raw.item, 4);//4
+		soundPool.load(context, R.raw.tip, 7);//5
+		soundPool.load(context, R.raw.bom, 6);//6
+		soundPool.load(context, R.raw.change, 2);//7
+		soundPool.load(context,R.raw.circle,1);//8
+		soundPool.load(context,R.raw.shot0,1);//9
 		soundPool.play(1,0,0,0,0,0);
 		pauseText = new Paint();
 		pauseText.setAntiAlias(useAntiAlias);
@@ -173,6 +175,16 @@ public static String[] hath={
 		//canvas=new Canvas();
 	}
 
+	@Override
+	protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+	{
+		sky = Bitmap.createScaledBitmap(jmp, getWidth(), getHeight(), true);
+		sky2space = Bitmap.createScaledBitmap(wmp, getWidth(), getHeight(), true);
+		earth= Bitmap.createScaledBitmap(vmp,getWidth(), (int)((float)getWidth()/(float)vmp.getWidth()*(float)vmp.getHeight()), true);
+		space= Bitmap.createScaledBitmap(ump, getHeight(), getHeight(), true);
+		super.onLayout(changed, left, top, right, bottom);
+	}
+
 	
 	
 	@Override
@@ -182,14 +194,16 @@ public static String[] hath={
 		//if(GAME_SITU!=isDEAD){
 
 		//}
+		drawBack(canvas);
 		if (GAME_SITU == isSTART)
 		{
 			startGame(canvas);
-			onStage();
+			onStage(canvas);
 		}
 		if (GAME_SITU == isPAUSE || GAME_SITU == isDEAD)
 		{
 			pauseGame(canvas);}
+		drawFront(canvas);
 		drawText(canvas);
 		drawDialog(canvas);
 		postInvalidate();
@@ -225,7 +239,6 @@ public static String[] hath={
 			selfY = getHeight() / 3f * 2f;
 			showText("〜Stage " + stage + "〜", 1);
 			game = +1;
-			sky = Bitmap.createScaledBitmap(jmp, getWidth(), getHeight(), true);
 			bg_garss_m = selfY + mmp.getHeight() / 2f;
 			canShot = false;
 		}
@@ -253,23 +266,7 @@ public static String[] hath={
 		frame3 = frame3 + 1;
 		}
 		frame = frame + 1;
-		drawSky(canvas);
-		canvas.drawBitmap(fire, selfX - mmp.getWidth() / 2f + 2, selfY + mmp.getHeight() / 2f, paint);
-		if (!liftoff)
-		{
-			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
-			move = move + 0.02f * frame3;
-			if (move >= bg_grass.getHeight())
-			{
-				liftoff = true;
-				//bg_grass = null;
-				game = game + 1;
-			}
-			if (selfY + mmp.getHeight() / 2f >= bg_garss_m + move)
-			{
-				selfY = bg_garss_m + move - mmp.getHeight() / 2;
-			}
-		}
+		//drawSky(canvas);	
 		for (int i=0;i < shotDAnmaku.size();i++)
 		{	shotDanmaku sd=shotDAnmaku.get(i);
 			sd.thereTime++;
@@ -422,12 +419,12 @@ public static String[] hath={
 	}
 	/*------------------游戏暂停或死亡----------------------*/
 	private void pauseGame(Canvas canvas)
-	{ drawSky(canvas);
+	{// drawSky(canvas);
 		canvas.drawBitmap(fire, selfX - mmp.getWidth() / 2f + 2, selfY + mmp.getHeight() / 2f, paint);
-		if (!liftoff)
-		{
-			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
-		}
+//		if (!liftoff)
+//		{
+//			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
+//		}
 		for (int i=0;i < shotDAnmaku.size();i++)
 		{
 			shotDanmaku sd=shotDAnmaku.get(i);
@@ -511,10 +508,7 @@ public static String[] hath={
 		canvas.drawBitmap(mmp, selfX - mmp.getWidth() / 2f, selfY - mmp.getHeight() / 2f, paint);
 		canvas.drawCircle(selfX, selfY, getHeight() / 260f, paint);
 	}
-	private void drawSky(Canvas canvas)
-	{
-		canvas.drawBitmap(sky, 0, 0, paint);
-	}
+	
 	public float getFrame()
 	{
 		return frame2;
@@ -894,7 +888,8 @@ public static String[] hath={
 					}}
 				if (game_life == 1)
 				{
-					addBonus(0.41f, 0.05f, getWidth() / 2f, getHeight() / 2f);
+					//addBonus(0.41f, 0.05f, getWidth() / 2f, getHeight() / 2f);
+					add钦点Bonus(getWidth()/2f,getHeight()/3f*2+getWidth()/60f,Bonus.F,finalB);
 
 				}
 				no_enemy = true;
@@ -912,6 +907,14 @@ public static String[] hath={
 	public void soundExplo()
 	{
 		soundPool.play(1, 1, 1, 0, 0, 1);
+	}
+	public void add钦点Bonus(float postX,float postY,int BonusType,Bitmap tietu){
+		Bonus mb=new Bonus();
+		mb.postX=postX;
+		mb.postY=postY;
+		mb.BONUS_TYPE=BonusType;
+		mb.tietu=tietu;
+		bonus_list.add(mb);
 	}
 	public void addBonus(float min, float bonus , float postX, float postY)
 	{
@@ -1211,9 +1214,8 @@ public static String[] hath={
 			}
 		}
 	}
-	private void onStage(){
+	private void onStage(Canvas canvas){
 		if(stage==1){
-			
 		if(frame3>=320&&
 		frame3%30==0&&
 		frame3<=620){
@@ -1278,6 +1280,7 @@ public static String[] hath={
 							ed.vy=(selfY-e.postY)/getWidth()*(3+0.4f*rank)*2;//(float)(Math.sqrt(Math.pow(selfY-e.postY,2)+Math.pow(selfX-e.postX,2))*(30+rank));
 							ed.range=getWidth()/75f;
 							enemy_danmaku_list.add(ed);
+							soundPool.play(9, 0.3f, 0.3f, 0, 0, 1);
 						}
 					}
 				}
@@ -1316,11 +1319,12 @@ public static String[] hath={
 				for(int j=0;j<enemy.size();j++){
 					Enemy e=enemy.get(j);
 					if(e.group==2){
-						addMultiCircleDanmaku(getWidth()/60f*(1+0.5f*rank),20+6*rank,e.postX,e.postY,1+(0.9f*rank),frame3/(50-8*rank)*((float)Math.PI/13f));
+						addMultiCircleDanmaku(getWidth()/60f*(1+0.5f*rank),20+6*rank,e.postX,e.postY,1+(0.9f*rank),frame3/(50-8*rank)*((float)Math.PI/13f),0xffffffff,0xff60b7ff);
+						soundPool.play(8, 0.5f, 0.5f, 0, 0, 1);
 					}
 				}
 			}
-			if(frame3>=(1500-(rank*100))&&frame3<=2100&&frame3%30==0){
+			if(frame3>=(1200+(rank*100))&&frame3<=2100&&frame3%30==0){
 				Enemy e=new Enemy();
 				e.postX=getWidth()*0.1f;
 				e.tietu=enemy1;
@@ -1328,7 +1332,7 @@ public static String[] hath={
 				e.bonus=0.1f;
 				e.postY=-enemy1.getHeight();
 				e.vy=getHeight()/400f;
-				e.littleBonus=0.05f*rank;
+				e.littleBonus=0.03f*rank;
 				e.autoDead=true;
 				e.group=3;
 				enemy.add(e);
@@ -1339,12 +1343,12 @@ public static String[] hath={
 				ei.bonus=0.1f;
 				ei.postY=-enemy1.getHeight();
 				ei.vy=getHeight()/400f;
-				ei.littleBonus=0.08f*rank;
+				ei.littleBonus=0.03f*rank;
 				ei.autoDead=true;
 				ei.group=3;
 				enemy.add(ei);
 			}
-			if(frame3>=(1500-(rank*100))&&frame3<=2100&&frame3%(50-7*rank)==0){
+			if(frame3>=(1200+(rank*100))&&frame3<=2100&&frame3%(50-7*rank)==0){
 				for(int ii=0;ii<enemy.size();ii++){
 					Enemy e=enemy.get(ii);
 					if(e.group==3){
@@ -1361,20 +1365,57 @@ public static String[] hath={
 						enemy_danmaku_list.add(ed);
 					}
 				}
+				soundPool.play(9, 1, 1, 0, 0, 1);
 			}
 			//TODO:这里写第一关的敌人和弹幕代码。
 		}
 		//TODO:这里写关卡代码
 	}
-	public void addMultiCircleDanmaku(float range,float danmakuNum,float postX,float postY,float generalSpeed,float move){
+	private void drawFront(Canvas canvas)//前景
+	{
+		if(stage==1){
+		}
+	}
+	public void drawBack(Canvas canvas)//背景
+	{
+		if(stage==1){
+			if(frame3<2400){
+				canvas.drawBitmap(sky, 0, 0,new Paint());
+			}else if(frame3>2400){
+				canvas.drawBitmap(space,0,0,new Paint());
+				canvas.drawBitmap(sky2space,0,0,new Paint());
+				canvas.drawBitmap(earth,0,getHeight()-earth.getHeight(),new Paint());
+			}
+		canvas.drawBitmap(fire, selfX - mmp.getWidth() / 2f + 2, selfY + mmp.getHeight() / 2f, paint);
+		if (!liftoff)
+		{
+			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
+			if(GAME_SITU==isSTART){
+				move = move + 0.02f * frame3;
+			}
+			if (move >= bg_grass.getHeight())
+			{
+				liftoff = true;
+				//bg_grass = null;
+				game = game + 1;
+			}
+			if (selfY + mmp.getHeight() / 2f >= bg_garss_m + move)
+			{
+				selfY = bg_garss_m + move - mmp.getHeight() / 2;
+			}
+		}
+		}
+		//
+	}
+	public void addMultiCircleDanmaku(float range,float danmakuNum,float postX,float postY,float generalSpeed,float move,int color,int facecolor){
 		float unitAngle=(float)Math.PI/danmakuNum*2;
 		float unitSpeed=getWidth()/300f*generalSpeed;
 		for(int j=0;j<danmakuNum;j++){
 			EnemyDanmaku ed=new EnemyDanmaku();
 			ed.range=range;
-			ed.color=0xffffffff;
+			ed.color=color;
 			ed.Shape=DANMAKU_TYPE_CIRCLE;
-			ed.faceColor=0xff60b7ff;
+			ed.faceColor=facecolor;
 			ed.postX=postX;
 			ed.postY=postY;
 			ed.vx=unitSpeed*(float)Math.sin(unitAngle*j+move);
