@@ -30,10 +30,10 @@ MainMenu mm;
 //				}
 //			});
 	}
-
 	@Override
 	protected void onDestroy()
-	{System.exit(0);
+	{
+		System.exit(0);
 		// TODO: Implement this method
 		super.onDestroy();
 	}

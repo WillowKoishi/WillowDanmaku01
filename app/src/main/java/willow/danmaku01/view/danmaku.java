@@ -1379,17 +1379,17 @@ public static String[] hath={
 	public void drawBack(Canvas canvas)//背景
 	{
 		if(stage==1){
-			if(frame3<2400){
+			if(frame3<2500){
 				canvas.drawBitmap(sky, 0, 0,new Paint());
-			}else if(frame3>2400){
+			}else if(frame3>2500){
 				canvas.drawBitmap(space,0,0,new Paint());
 				canvas.drawBitmap(sky2space,0,0,new Paint());
 				canvas.drawBitmap(earth,0,getHeight()-earth.getHeight(),new Paint());
 			}
-		canvas.drawBitmap(fire, selfX - mmp.getWidth() / 2f + 2, selfY + mmp.getHeight() / 2f, paint);
+		canvas.drawBitmap(fire, selfX - mmp.getWidth() / 2f + 2, selfY + mmp.getHeight() / 2f, new Paint());
 		if (!liftoff)
 		{
-			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, paint);
+			canvas.drawBitmap(bg_grass, getWidth() / 2 - bg_grass.getWidth() / 2, bg_garss_m + move, new Paint());
 			if(GAME_SITU==isSTART){
 				move = move + 0.02f * frame3;
 			}

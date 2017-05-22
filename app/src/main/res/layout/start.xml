@@ -13,23 +13,24 @@
 		android:layout_weight="1.0"
 		android:id="@+id/danmaku"/>
 
-	<LinearLayout
+	<willow.danmaku01.view.DebugBar
 		android:layout_height="wrap_content"
 		android:layout_width="match_parent"
 		android:orientation="horizontal"
-		android:visibility="gone">
+		android:visibility="gone"
+		android:id="@+id/startDebugBar1">
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:text="Start"
+			android:text="+1"
 			android:onClick="start"
 			style="@style/AppTheme"/>
 
 		<Button
 			android:layout_height="wrap_content"
 			android:layout_width="wrap_content"
-			android:text="Pause"
+			android:text="快进2s"
 			android:onClick="pause"
 			style="@style/AppTheme"/>
 
@@ -47,7 +48,7 @@
 			android:id="@+id/mainButton1"
 			android:onClick="bomb"/>
 
-	</LinearLayout>
+	</willow.danmaku01.view.DebugBar>
 
 </LinearLayout>
 
